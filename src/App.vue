@@ -5,7 +5,7 @@
      <img id="edibulllogo" alt="Edibulllogo" src="./assets/edibullFINAL 1024.png" style="position:absolute;width:5%;border-radius:50%">
      </a>
      <div id="logo">
-     <font>Edibull</font>
+     <font>EdiBull</font>
      </div>
      </div>
      <div class="row">
