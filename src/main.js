@@ -1,12 +1,14 @@
 import Vue from 'vue'
-import App from './App.vue'
 import VueRouter from 'vue-router'
+import BootstrapVue from 'bootstrap-vue'
+import App from './App.vue'
 
 // allow vue-router to pull pages
 import Portals from './components/Portals'
 import Edibull from './components/Edibull'
 
 Vue.use(VueRouter)
+Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false
 
