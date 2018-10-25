@@ -84,7 +84,7 @@ export default {
 
 </script>
 
-<style scope>
+<style scoped>
 .grid-container {
   display: grid;
   grid-template-columns: 425px 425px 425px;
