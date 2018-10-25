@@ -7,22 +7,28 @@
      <div id="logo">
       <font>EdiBull</font>
      </div>
-    <input type="text" id="myInput" onkeyup="myfunction()" placeholder="Search Organizations...">
     </div>
-    <div class="row">
-      <Edibull></Edibull>
+     <!-- Nav Bar -->
+    <div id="nav-bar">
+      <!-- vue-router (link to separate page) -->
+      <div class="hover">
+        <p><router-link to="/">EdiBull</router-link></p>
+      </div>
+      <div class="hover">
+        <p><router-link to="/portals">Portals</router-link></p>
+      </div>
     </div>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Edibull from './components/Edibull'
 
 export default {
   name: 'app',
-  components: {
-    Edibull
-  }
+  // components: {
+  //   Edibull
+  // }
 }
 </script>
 
@@ -30,7 +36,10 @@ export default {
 body {
   background-color: rgba(176, 187, 187, 0.63);
 }
+</style>
 
+
+<style scoped>
 #logo {
   text-align: center;
   font-size: 80px;
@@ -47,10 +56,22 @@ body {
   }
 
 #edibulllogo {
-  margin: 20px;
+  position: relative;
+  margin-top: 20px;
+  margin-left: 20px;
 }
 
-#myinput {
-
+#nav-bar {
+  background-color: rgb(156, 173, 108);
+  display: flex; 
+}
+#nav-bar p {
+    padding: 0px 35px;
+    letter-spacing: 2px;
+    font-family: Cambria;
+}
+.hover:hover {
+    transition: 0.7s;
+    background-color: rgb(106, 129, 64);
 }
 </style>
