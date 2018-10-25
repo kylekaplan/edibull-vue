@@ -1,8 +1,8 @@
 <template>
-    <div class="grid-container">
+    <div class="grid-container" id="grid">
        <div class="card" v-for="event in events" :key="event.id">
          <a href="">
-         <font id="date">{{display_time(event)}}</font>
+         <font id="time">{{display_time(event)}}</font>
          <div class="photo">
          <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
          </div>
@@ -18,6 +18,7 @@
 
 <script> 
 import axios from 'axios'
+import Shufflejs from 'shufflejs'
 
 export default {
     name: 'Edibull',
@@ -35,6 +36,11 @@ export default {
       }, (error) => {
         // pass
       })    
+
+    const shuffleInstance = new Shuffle(document.getElementById('grid'), {
+      itemSelector: '.card',
+     // sizer: '.js-shuffle-sizer'
+    });
   },
   
   methods: {
@@ -96,7 +102,7 @@ export default {
 .grid-container > div {
   box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
   transition:0.4s;
-  background: rgba(255, 255, 255, 0.877);
+  background: rgba(255, 255, 255, 0.63);
   margin: 10px;
   width: 100%;
   height: 200px;
@@ -119,7 +125,7 @@ export default {
   float: left;
 }
 
-#date {
+#time {
   font-size: 15px;
   float: right;
   margin-top: 20px;

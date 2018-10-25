@@ -2,15 +2,16 @@
   <div class="main">
    <div class="banner">
      <a href="https://edibullapp.com/">
-     <img id="edibulllogo" alt="Edibulllogo" src="./assets/edibullFINAL 1024.png" style="position:absolute;width:5%;border-radius:50%">
+      <img id="edibulllogo" alt="Edibulllogo" src="./assets/edibullFINAL 1024.png" style="position:absolute;width:5%;border-radius:50%">
      </a>
      <div id="logo">
-     <font>EdiBull</font>
+      <font>EdiBull</font>
      </div>
-     </div>
-     <div class="row">
-          <Edibull></Edibull>
-      </div>
+    <input type="text" id="myInput" onkeyup="myfunction()" placeholder="Search Organizations...">
+    </div>
+    <div class="row">
+      <Edibull></Edibull>
+    </div>
   </div>
 </template>
 
@@ -47,5 +48,9 @@ body {
 
 #edibulllogo {
   margin: 20px;
+}
+
+#myinput {
+
 }
 </style>
