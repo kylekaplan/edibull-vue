@@ -1,16 +1,46 @@
 <template>
   <div>
     <ul id="Filter">
-      <font id="subhead">Filter</font><br>
-      <button class="button" type="submit" data-value="Speaker">Speaker</button>
-      <button class="button" type="submit" data-value="Employment">Employment</button>
-      <button class="button" type="submit" data-value="Fundraiser">Fundraiser</button>
-      <button class="button" type="submit" data-value="Volunteer">Volunteer</button>
-      <button class="button" type="submit" data-value="Free Food">Free Food</button>
+      <font id="filterLabel">Filter</font><br>
+      <button class="button" type="submit" data-value="Speaker" v-on:click="myfilter('Speaker')">Speaker</button>
+      <button class="button" type="submit" data-value="Employment" v-on:click="myfilter('Employment')">Employment</button>
+      <button class="button" type="submit" data-value="Fundraiser" v-on:click="myfilter('Fundraiser')">Fundraiser</button>
+      <button class="button" type="submit" data-value="Volunteer" v-on:click="myfilter('Volunteer')">Volunteer</button>
+      <button class="button" type="submit" data-value="Free Food" v-on:click="myfilter('Free Food')">Free Food</button>
     </ul>
+ <!-- start copy -->
+        <div class="container">
 
+    <div class="row">
+
+      <div class="col-4@sm col-3@md">
+        <div class="filters-group">
+          <label for="filters-search-input" class="filter-label">Search</label>
+          <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input">
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+
+      <div class="col-12@sm filters-group-wrap">
+        <div class="filters-group">
+          <p class="filter-label">Filter</p>
+          <div class="btn-group filter-options">
+            <button class="btn btn--primary" data-group="Speaker">Speaker</button>
+            <button class="btn btn--primary" data-group="Free Food">Free Food</button>
+            <button class="btn btn--primary" data-group="animal">Animal</button>
+            <button class="btn btn--primary" data-group="city">City</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+        <!-- end copy -->
       <div class="grid-container" id="my-shuffle">
-        <div class="card" v-for="event in events" :key="event.id" :data-groups='[get_group(event)]' :data-date='[event.dates[0].starts_at.substr(0, 10)]'>
+       
+        <div class="card" v-for="event in events" :key="event.id" :data-groups="get_group(event)" :data-date='[event.dates[0].starts_at.substr(0, 10)]'>
           <a href="">
           <font id="time">{{display_time(event)}}</font>
           <div class="photo">
@@ -47,102 +77,209 @@ export default {
         console.log('this.events', this.events)
       }, (error) => {
         // pass
-      })    
+      })
+      console.log('mount');
 
-    var Demo=function (element){
-      this.groups = Array.from(document.querySelectorAll('.js-groups button'));
+      'use strict';
 
-      // The elements are in the DOM, initialize a shuffle instance.
-      this.shuffle = new Shuffle(document.getElementById("my-shuffle"), {
-        itemSelector: '.card',
-        sizer: '.photo-grid__sizer',
-      });
+var Shuffle = window.shuffle;
 
-      this.filters = {
-      groups: []
-      };
-    this._bindEventListeners();
+var Demo = function (element) {
+  this.element = element;
+
+  // Log out events.
+  this.addShuffleEventListeners();
+
+  this.shuffle = new Shuffle(element, {
+    itemSelector: '.card',
+    sizer: element.querySelector('.photo-grid__sizer'),
+  });
+
+  this._activeFilters = [];
+
+  this.addFilterButtons();
+  this.addSorting();
+  this.addSearchFilter();
+
+  this.mode = 'exclusive';
+};
+
+Demo.prototype.toArray = function (arrayLike) {
+  return Array.prototype.slice.call(arrayLike);
+};
+
+Demo.prototype.toggleMode = function () {
+  if (this.mode === 'additive') {
+    this.mode = 'exclusive';
+  } else {
+    this.mode = 'additive';
+  }
+};
+
+/**
+ * Shuffle uses the CustomEvent constructor to dispatch events. You can listen
+ * for them like you normally would (with jQuery for example). The extra event
+ * data is in the `detail` property.
+ */
+Demo.prototype.addShuffleEventListeners = function () {
+  var handler = function (event) {
+    console.log('type: %s', event.type, 'detail:', event.detail);
+  };
+
+  this.element.addEventListener(Shuffle.EventType.LAYOUT, handler, false);
+  this.element.addEventListener(Shuffle.EventType.REMOVED, handler, false);
+};
+
+Demo.prototype.addFilterButtons = function () {
+  var options = document.querySelector('.filter-options');
+
+  if (!options) {
+    return;
+  }
+
+  var filterButtons = this.toArray(
+    options.children
+  );
+
+  filterButtons.forEach(function (button) {
+    button.addEventListener('click', this._handleFilterClick.bind(this), false);
+  }, this);
+};
+
+Demo.prototype._handleFilterClick = function (evt) {
+  var btn = evt.currentTarget;
+  var isActive = btn.classList.contains('active');
+  var btnGroup = btn.getAttribute('data-group');
+
+  // You don't need _both_ of these modes. This is only for the demo.
+
+  // For this custom 'additive' mode in the demo, clicking on filter buttons
+  // doesn't remove any other filters.
+  if (this.mode === 'additive') {
+    // If this button is already active, remove it from the list of filters.
+    if (isActive) {
+      this._activeFilters.splice(this._activeFilters.indexOf(btnGroup));
+    } else {
+      this._activeFilters.push(btnGroup);
+    }
+
+    btn.classList.toggle('active');
+
+    // Filter elements
+    this.shuffle.filter(this._activeFilters);
+
+  // 'exclusive' mode lets only one filter button be active at a time.
+  } else {
+    this._removeActiveClassFromChildren(btn.parentNode);
+
+    var filterGroup;
+    if (isActive) {
+      btn.classList.remove('active');
+      filterGroup = Shuffle.ALL_ITEMS;
+    } else {
+      btn.classList.add('active');
+      filterGroup = btnGroup;
+    }
+
+    this.shuffle.filter(filterGroup);
+  }
+};
+
+Demo.prototype._removeActiveClassFromChildren = function (parent) {
+  var children = parent.children;
+  for (var i = children.length - 1; i >= 0; i--) {
+    children[i].classList.remove('active');
+  }
+};
+
+Demo.prototype.addSorting = function () {
+  var menu = document.querySelector('.sort-options');
+
+  if (!menu) {
+    return;
+  }
+
+  menu.addEventListener('change', this._handleSortChange.bind(this));
+};
+
+Demo.prototype._handleSortChange = function (evt) {
+  var value = evt.target.value;
+  var options = {};
+
+  function sortByDate(element) {
+    return element.getAttribute('data-created');
+  }
+
+  function sortByTitle(element) {
+    return element.getAttribute('data-title').toLowerCase();
+  }
+
+  if (value === 'date-created') {
+    options = {
+      reverse: true,
+      by: sortByDate,
     };
-
-    /* Bind event listeners for when the filters change.*/
-    Demo.prototype._bindEventListeners = function () {
-      this._onGroupsChange = this._handleGroupsChange.bind(this);
-
-      this.groups.forEach(function (button) {
-        button.addEventListener('click', this._onGroupsChange);
-      }, this);
+  } else if (value === 'title') {
+    options = {
+      by: sortByTitle,
     };
+  }
 
-    // Get the values of each `active` button.
-    //  @return {Array.<string>}
-    Demo.prototype._getCurrentGroupsFilters = function () {
-      return this.colors.filter(function (button) {
-        return button.classList.contains('active');
-      }).map(function (button) {
-        return button.getAttribute('data-value');
-      });
-    };
+  this.shuffle.sort(options);
+};
 
-    //  A color button was clicked. Update filters and display.
-    //  @param {Event} evt Click event object
-    Demo.prototype._handleGroupsChange = function (evt) {
-      var button = evt.currentTarget;
+// Advanced filtering
+Demo.prototype.addSearchFilter = function () {
+  var searchInput = document.querySelector('.js-shuffle-search');
 
-      // Treat these buttons like radio buttons where only 1 can be selected.
-      if (button.classList.contains('active')) {
-        button.classList.remove('active');
-      } else {
-        this.colors.forEach(function (btn) {
-          btn.classList.remove('active');
-        });
+  if (!searchInput) {
+    return;
+  }
 
-        button.classList.add('active');
-      }
+  searchInput.addEventListener('keyup', this._handleSearchKeyup.bind(this));
+};
 
-      this.filters.groups = this._getCurrentGroupsFilters();
-      this.filter();
-    };
+/**
+ * Filter the shuffle instance by items with a title that matches the search input.
+ * @param {Event} evt Event object.
+ */
+Demo.prototype._handleSearchKeyup = function (evt) {
+  var searchText = evt.target.value.toLowerCase();
 
-    /* Filter shuffle based on the current state of filters. */
-    Demo.prototype.filter = function () {
-      if (this.hasActiveFilters()) {
-        this.shuffle.filter(this.itemPassesFilters.bind(this));
-      } else {
-        this.shuffle.filter(Shuffle.ALL_ITEMS);
-      }
-    };
+  this.shuffle.filter(function (element, shuffle) {
 
-    //  If any of the arrays in the `filters` property have a length of more than zero,
-    //  that means there is an active filter.
-    //  @return {boolean}
-    Demo.prototype.hasActiveFilters = function () {
-      return Object.keys(this.filters).some(function (key) {
-        return this.filters[key].length > 0;
-      }, this);
-    };
+    // If there is a current filter applied, ignore elements that don't match it.
+    if (shuffle.group !== Shuffle.ALL_ITEMS) {
+      // Get the item's groups.
+      var groups = JSON.parse(element.getAttribute('data-groups'));
+      var isElementInCurrentGroup = groups.indexOf(shuffle.group) !== -1;
 
-    //  Determine whether an element passes the current filters.
-    //  @param {Element} element Element to test.
-    //  @return {boolean} Whether it satisfies all current filters.
-    Demo.prototype.itemPassesFilters = function (element) {
-      var groups = this.filters.groups;
-      var group = element.getAttribute('data-groups');
-
-      // If there are active color filters and this color is not in that array.
-      if (groups.length > 0 && !groups.includes(group)) {
+      // Only search elements in the current group
+      if (!isElementInCurrentGroup) {
         return false;
       }
+    }
 
-      return true;
-    };
+    var titleElement = element.querySelector('.picture-item__title');
+    var titleText = titleElement.textContent.toLowerCase().trim();
 
-    document.addEventListener('DOMContentLoaded', function () {
-      window.demo = new Demo(document.querySelector('.js-shuffle'));
-    });
+    return titleText.indexOf(searchText) !== -1;
+  });
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+  window.demo = new Demo(document.getElementById('my-shuffle'));
+});
+      console.log('window', window.demo)
 
 },
   
   methods: {
+
+    myfilter(x) {
+      console.log(this.demo);
+      // document.window.demo.filter('space');
+    },
 
     //get photo for event
     get_photo(event) {
@@ -155,16 +292,16 @@ export default {
     },
 
     get_group(event){
-      if(event.speakerApproved.lenght > 0){
-        return "Speaker";
+      if(event.speakerApproved.length > 0){
+        return "['Speaker']";
       } else if (event.employmentApproved.length > 0) {
-        return "Employment";
+        return "['Employment']";
       } else if (event.fundraiseApproved.length > 0) {
-        return "Fundraiser";
+        return "['Fundraiser']";
       } else if (event.volunteerApproved.length > 0) {
-        return "Volunteer";
+        return "['Volunteer']";
       } else if (event.freeFoodApproved.length > 0) {
-        return "Free Food";
+        return "['Free Food']";
       }
     },
 
@@ -201,7 +338,7 @@ export default {
 
 <style scope>
 
-#subhead {
+#filterLabel {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   margin-left: 5px;
 }
