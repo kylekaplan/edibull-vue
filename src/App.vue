@@ -26,15 +26,12 @@
 
 export default {
   name: 'app',
-  // components: {
-  //   Edibull
-  // }
 }
 </script>
 
 <style>
 body {
-  background-color: rgba(176, 187, 187, 0.63);
+  background-color: rgba(176, 187, 187, 0.63) !important;
 }
 </style>
 
