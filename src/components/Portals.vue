@@ -1,8 +1,33 @@
 <template>
   <div>
     <div class="container">
+      <div class="row">
+        <div class="col-4@sm col-3@md">
+          <div class="filters-group">
+            <label for="filters-search-input" class="filter-label">Search</label>
+            <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12@sm filters-group-wrap">
+          <div class="filters-group">
+            <p class="filter-label">Filter</p>
+            <div class="btn-group filter-options">
+              <button class="btn btn--primary" data-group="Nature">nature</button>
+              <button class="btn btn--primary" data-group="Free Food">Free Food</button>
+              <button class="btn btn--primary" data-group="animal">Animal</button>
+              <button class="btn btn--primary" data-group="city">City</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="row my-shuffle" id="my-shuffle">
-          <div v-for="image in photos" :key="image.id" class="w-25 p-1 photo-item">
+          <div v-for="image in photos" :key="image.id" class="w-25 p-1 card"
+            data-groups='["nature"]'
+            data-date-created="2017-04-30"
+            data-title="Lake Walchen"
+          >
             <div class="aspect aspect--4x3">
               <div class="aspect__inner">
                 <img :src="image.src" />
@@ -10,7 +35,7 @@
               </div>
             </div>
           </div>
-        <div class="w-25 photo-grid__sizer"></div>
+        <div class="w-25 my-sizer-element"></div>
       </div>
     </div>
   </div>
@@ -19,6 +44,7 @@
 <script> 
 import axios from 'axios'
 import Shuffle from 'shufflejs'
+import Demo from '../assets/shuffle-demo.js'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 const grayPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='
@@ -47,10 +73,13 @@ export default {
   },
   mounted () {
     // The elements are in the DOM, initialize a shuffle instance.
-    this.shuffle = new Shuffle(document.getElementById('my-shuffle'), {
-      itemSelector: '.photo-item',
-      sizer: '.photo-grid__sizer',
-    });
+    // document.addEventListener('DOMContentLoaded', function () {
+      this.demo = new Demo(document.getElementById('my-shuffle'));
+    // });
+    // this.shuffle = new Shuffle(document.getElementById('my-shuffle'), {
+    //   itemSelector: '.card',
+    //   sizer: '.my-sizer-element',
+    // });
     console.log('initialized shuffle')
     // Kick off the network request and update the state once it returns.
     this._fetchPhotos()
@@ -61,14 +90,14 @@ export default {
   },
   beforeDestroy () {
     // Dispose of shuffle when it will be removed from the DOM.
-    this.shuffle.destroy();
-    this.shuffle = null;
+    this.demo.shuffle.destroy();
+    this.demo.shuffle = null;
   },
   updated() {
     // Fired every second, should always be true
     console.log('updated')
-    console.log('this.shuffle', this.shuffle)
-    this.shuffle.resetItems()
+    console.log('this.demo', this.demo)
+    this.demo.shuffle.resetItems()
     // console.log('updated')
   },
   methods: {
