@@ -1,28 +1,11 @@
 <template>
   <div>
-    <!-- <ul id="Filter">
-      <font id="filterLabel">Filter</font><br>
-      <button class="button" type="submit" data-value="Speaker" v-on:click="myfilter('Speaker')">Speaker</button>
-      <button class="button" type="submit" data-value="Employment" v-on:click="myfilter('Employment')">Employment</button>
-      <button class="button" type="submit" data-value="Fundraiser" v-on:click="myfilter('Fundraiser')">Fundraiser</button>
-      <button class="button" type="submit" data-value="Volunteer" v-on:click="myfilter('Volunteer')">Volunteer</button>
-      <button class="button" type="submit" data-value="Free Food" v-on:click="myfilter('Free Food')">Free Food</button>
-    </ul> -->
  <!-- start copy -->
         <div class="container">
 
     <div class="row">
-      <div class="col-4@sm col-3@md">
+      <div class="column left filters-group-wrap">
         <div class="filters-group">
-          <label for="filters-search-input" class="filter-label">Search</label>
-          <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input">
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-12@sm filters-group-wrap">
-        <div class="filters-group">
-          <p class="filter-label">Filter</p>
           <div class="btn-group filter-options">
             <button class="btn btn--primary" data-group="Speaker">Speaker</button>
             <button class="btn btn--primary" data-group="Free Food">Free Food</button>
@@ -32,26 +15,27 @@
           </div>
         </div>
         <fieldset class="filters-group">
-          <legend class="filter-label">Sort</legend>
-          <div class="btn-group sort-options">
-            <label class="btn active">
-              <input type="radio" name="sort-value" value="dom"> Default
+          <div class="button-group sort-options">
+            <label class="button active">
+              <input type="radio" name="sort-value" value="dom"> Date
             </label>
-            <label class="btn">
+            <label class="button">
               <input type="radio" name="sort-value" value="title"> Title
-            </label>
-            <label class="btn">
-              <input type="radio" name="sort-value" value="date-created"> Date Created
             </label>
           </div>
         </fieldset>
       </div>
+      <div class="column right">
+        <div id="look_up">
+        <div class="filters-group" id="search_bar">
+          <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events...">
+        </div>
+        </div>
+      </div>
     </div>
-
   </div>
         <!-- end copy -->
       <div class="grid-container" id="grid">
-       
         <div class="card" v-for="event in events" :key="event.id"
           :data-groups="get_group(event)"
           :data-date='[event.dates[0].starts_at.substr(0, 10)]'
@@ -64,11 +48,10 @@
           </div>
           <div class="info">
             <br>
-            <h4 id="eventTitle">{{event.title}}</h4>
+            <h5 class="eventTitle">{{event.title}}</h5>
             <p>{{event.freeFoodApproved[0]}}</p>
           </div>
           </a>
-          <div class="w-25 my-sizer-element"></div>
         </div>
       </div>
   </div>
@@ -78,6 +61,8 @@
 import axios from 'axios'
 // import Shuffle from 'shufflejs'
 import Demo from '../assets/shuffle-demo';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 export default {
     name: 'Edibull',
@@ -91,13 +76,14 @@ export default {
       .then((response) => {
         this.events = response.data.events;
         console.log('this.events', this.events)
+        this.demo = new Demo(document.getElementById('grid'));
       }, (error) => {
         // pass
       })
   },
   mounted () {
     console.log('mounted');
-    this.demo = new Demo(document.getElementById('grid'));
+    // this.demo = new Demo(document.getElementById('grid'));
   },
   beforeDestroy () {
     // Dispose of shuffle when it will be removed from the DOM.
@@ -163,37 +149,46 @@ export default {
 
 <style scoped>
 
-#filterLabel {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  margin-left: 5px;
+#search_bar {
+  margin-top: 10px;
+  float: right;
+}
+
+.column {
+    float: left;
+    width: 50%;
+}
+
+.btn-group {
+  margin-top: 10px;
+}
+
+.sort-options {
+  margin-top: 10px;
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: 425px 425px 425px;
-  grid-row: 300px;
-  grid-gap: 10px;
-  margin: 15px;
+  margin-left: 40px;
+  margin-right: 40px;
 }
 
-.grid-container > div {
+.textfield {
+  padding: 5px;
+}
+
+.card {
   box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
   transition:0.4s;
   background: rgba(255, 255, 255, 0.712);
   margin: 10px;
-  width: 100%;
-  height: 180px;
+  width: 400px;
   overflow: hidden;
   border-radius: 30px;
 }
 
 .card:hover{
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
-  -ms-transform: scale(1.2); /* IE 9 */
-  -webkit-transform: scale(1.2); /* Safari 3-8 */
-  transform: scale(1.2); 
-  width:100%;
-  height: 100%;
+  background: rgba(255, 255, 255, 0.918);
 }
 
 .info{
@@ -215,7 +210,7 @@ export default {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.button {
+.btn {
   background-color: rgba(255, 255, 255, 0.726);
   color:  rgb(42, 83, 49);
   border: 2px solid  rgb(42, 83, 49);
@@ -225,9 +220,18 @@ export default {
   transition-duration: 0.4s;
 }
 
-.button:hover {
+.btn:hover {
   background-color: rgb(42, 83, 49);
   color: white;
+}
+
+.filter-options .active {
+  background-color: rgb(42, 83, 49);
+  color: white;
+}
+
+.button {
+  margin-right: 15px;
 }
 
 </style>

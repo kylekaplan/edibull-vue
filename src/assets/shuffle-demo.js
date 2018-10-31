@@ -1,5 +1,7 @@
 import Shuffle from 'shufflejs'
 
+
+
 'use strict';
 
 // var Shuffle = window.Shuffle;
@@ -9,7 +11,7 @@ var Demo = function (element) {
 
   this.shuffle = new Shuffle(element, {
     itemSelector: '.card',
-    sizer: '.my-sizer-element',
+    // sizer: '.my-sizer-element',
   });
 
   // Log events.
@@ -186,7 +188,7 @@ Demo.prototype._handleSearchKeyup = function (evt) {
       }
     }
 
-    var titleElement = element.querySelector('#eventTitle');
+    var titleElement = element.querySelector('.eventTitle');
     var titleText = titleElement.textContent.toLowerCase().trim();
 
     return titleText.indexOf(searchText) !== -1;
