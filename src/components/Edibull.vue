@@ -1,24 +1,55 @@
 <template>
   <div>
-    <ul id="Filter">
-      <font id="subhead">Filter</font><br>
-      <button class="button" type="submit" value="Speaker">Speaker</button>
-      <button class="button" type="submit" value="Employment">Employment</button>
-      <button class="button" type="submit" value="Fundraiser">Fundraiser</button>
-      <button class="button" type="submit" value="Volunteer">Volunteer</button>
-      <button class="button" type="submit" value="Free Food">Free Food</button>
-    </ul>
+ <!-- start copy -->
+        <div class="container">
 
+    <div class="row">
+      <div class="column left filters-group-wrap">
+        <div class="filters-group">
+          <div class="btn-group filter-options">
+            <button class="btn btn--primary" data-group="Speaker">Speaker</button>
+            <button class="btn btn--primary" data-group="Free Food">Free Food</button>
+            <button class="btn btn--primary" data-group="Fundraiser">Fundraiser</button>
+            <button class="btn btn--primary" data-group="Employment">Employment</button>
+            <button class="btn btn--primary" data-group="Volunteer">Volunteer</button>
+          </div>
+        </div>
+        <fieldset class="filters-group">
+          <div class="button-group sort-options">
+            <label class="button active">
+              <input type="radio" name="sort-value" value="dom"> Date
+            </label>
+            <label class="button">
+              <input type="radio" name="sort-value" value="title"> Title
+            </label>
+          </div>
+        </fieldset>
+      </div>
+      <div class="column right">
+        <div id="look_up">
+        <div class="filters-group" id="search_bar">
+          <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events...">
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+        <!-- end copy -->
       <div class="grid-container" id="grid">
-        <div class="card" v-for="event in events" :key="event.id" :data-groups='[get_group(event)]'>
+        <div class="card" v-for="event in events" :key="event.id"
+          :data-groups="get_group(event)"
+          :data-date='[event.dates[0].starts_at.substr(0, 10)]'
+          :data-title="event.title"
+          >
           <a href="">
           <font id="time">{{display_time(event)}}</font>
           <div class="photo">
             <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
           </div>
           <div class="info">
-            <h3>{{event.title}} </h3>
-            <p>{{event.freeFoodApproved[0]}}</p><br>
+            <br>
+            <h5 class="eventTitle">{{event.title}}</h5>
+            <p>{{event.freeFoodApproved[0]}}</p>
           </div>
           </a>
         </div>
@@ -28,8 +59,10 @@
 
 <script> 
 import axios from 'axios'
-import Shufflejs from 'shufflejs'
-
+// import Shuffle from 'shufflejs'
+import Demo from '../assets/shuffle-demo';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
 export default {
     name: 'Edibull',
     data () {
@@ -37,63 +70,62 @@ export default {
       events: [],
     }
   },
-
-  mounted () {
+  created () {
     axios.get("https://edibullapp.com/events?approved=true")
       .then((response) => {
         this.events = response.data.events;
         console.log('this.events', this.events)
+        this.demo = new Demo(document.getElementById('grid'));
       }, (error) => {
         // pass
-      })    
-
-    const shuffleInstance = new Shuffle(document.getElementById('grid'), {
-      itemSelector: '.card',
-     // sizer: '.js-shuffle-sizer'
-    });
+      })
   },
-  
+  mounted () {
+    console.log('mounted');
+    // this.demo = new Demo(document.getElementById('grid'));
+  },
+  beforeDestroy () {
+    // Dispose of shuffle when it will be removed from the DOM.
+    this.demo.shuffle.destroy();
+    this.demo.shuffle = null;
+  },
+  updated() {
+    // Fired every second, should always be true
+    this.demo.shuffle.resetItems()
+  },
   methods: {
-
-    //get photo for event
+    // get photo for event
     get_photo(event) {
       if (event.thumbnail_url != null) {
           return event.thumbnail_url;
       } else if(event.portal.picture_url != null) {
           return event.portal.picture_url;
       }
-      return "./assets/edibullFINAL 1024.png";
+      return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
     },
-
     get_group(event){
-      if(event.speakerApproved.lenght > 0){
-        return "Speaker";
+      console.log("get_group", event)
+      if(event.speakerApproved.length > 0){
+        return '["Speaker"]';
       } else if (event.employmentApproved.length > 0) {
-        return "Employment";
+        return '["Employment"]';
       } else if (event.fundraiseApproved.length > 0) {
-        return "Fundraiser";
+        return '["Fundraiser"]';
       } else if (event.volunteerApproved.length > 0) {
-        return "Volunteer";
+        return '["Volunteer"]';
       } else if (event.freeFoodApproved.length > 0) {
-        return "Free Food";
+        return '["Free Food"]';
       }
     },
-
-    display_time(event){
+    display_time(event) {
       const startUtcTime = new Date(event.dates[0].starts_at)
       var startTimeValue = this.getTime(startUtcTime)
-
-      const endUtcTime = new Date(event.dates[0].ends_at)
-      var endTimeValue = this.getTime(endUtcTime)
-
-      return startTimeValue + " - " + endTimeValue;
-      },
-
+      return event.dates[0].starts_at.substring(5, 7) + "/" + event.dates[0].starts_at.substring(8, 10) + "/" + event.dates[0].starts_at.substring(2, 4) + " " + startTimeValue;
+    },
     // get time of event
     getTime (utcTime) {
       const hours = Number(utcTime.getHours())
       const minutes = Number(utcTime.getMinutes())
-
       // calculate
       let timeValue
       if (hours > 0 && hours <= 12) {
@@ -103,71 +135,66 @@ export default {
       } else if (hours === 0) {
         timeValue = '12'
       }
-
       timeValue += (minutes < 10) ? `:0${minutes}` : `:${minutes}` // get minutes
-      timeValue += (hours >= 12) ? ' pm' : ' am' // get AM/PM
+      timeValue += (hours >= 12) ? 'pm' : 'am' // get AM/PM
       return timeValue
     },
   }
 }
-
 </script>
 
-<style scope>
-
-#subhead {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-  margin-left: 5px;
+<style scoped>
+#search_bar {
+  margin-top: 10px;
+  float: right;
 }
-
+.column {
+    float: left;
+    width: 50%;
+}
+.btn-group {
+  margin-top: 10px;
+}
+.sort-options {
+  margin-top: 10px;
+}
 .grid-container {
-  display: grid;
-  grid-template-columns: 425px 425px 425px;
-  grid-row: 300px;
-  grid-gap: 10px;
-  margin: 15px;
+  margin-left: 40px;
+  margin-right: 40px;
 }
-
-.grid-container > div {
+.textfield {
+  padding: 5px;
+}
+.card {
   box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
   transition:0.4s;
-  background: rgba(255, 255, 255, 0.63);
+  background: rgba(255, 255, 255, 0.712);
   margin: 10px;
-  width: 100%;
-  height: 200px;
+  width: 400px;
   overflow: hidden;
   border-radius: 30px;
 }
-
 .card:hover{
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
-  -ms-transform: scale(1.2); /* IE 9 */
-  -webkit-transform: scale(1.2); /* Safari 3-8 */
-  transform: scale(1.2); 
-  width:100%;
-  height: 100%;
+  background: rgba(255, 255, 255, 0.918);
 }
-
 .info{
   padding: 2px 16px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
   text-align: center;
   margin-top: 30px;
 }
-
 .photo {
   float: left;
 }
-
 #time {
   font-size: 15px;
   float: right;
   margin-top: 20px;
   margin-right: 30px;
+  margin-left: 40px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
-
-.button {
+.btn {
   background-color: rgba(255, 255, 255, 0.726);
   color:  rgb(42, 83, 49);
   border: 2px solid  rgb(42, 83, 49);
@@ -176,14 +203,15 @@ export default {
   text-align: center;
   transition-duration: 0.4s;
 }
-
-.button:hover {
+.btn:hover {
   background-color: rgb(42, 83, 49);
   color: white;
 }
-
-a {
-  text-decoration: none;
+.filter-options .active {
+  background-color: rgb(42, 83, 49);
+  color: white;
 }
-
+.button {
+  margin-right: 15px;
+}
 </style>
