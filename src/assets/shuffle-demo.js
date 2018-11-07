@@ -195,6 +195,23 @@ Demo.prototype._handleSearchKeyup = function (evt) {
   });
 };
 
+  const highlight = (evt) => {
+  console.log(evt);
+
+  var child = document.getElementById("title_info");
+  child.classList.add("highlight");
+
+  // var span = document.createElement("span");
+  // // span.id = "title_info";
+  // var mark = document.createElement("mark");
+  // var newNode = document.createTextNode(evt);
+  // mark.appendChild(newNode);
+  // // span.appendChild(mark);
+  // // heading.appendChild(mark);
+  // child.replaceWith(mark);
+
+};
+
 // document.addEventListener('DOMContentLoaded', function () {
 //     window.demo = new Demo(document.getElementById('grid'));
 // });
