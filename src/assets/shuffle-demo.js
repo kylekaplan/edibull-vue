@@ -185,39 +185,37 @@ Demo.prototype._handleSearchKeyup = function (evt) {
         return false;
       }
     }
-
     // document.getElementById("highlight").style.backgroundColor = "yellow";
 
 
-    var titleElement = element.querySelector('.eventTitle');
-    var titleText = titleElement.textContent.toLowerCase().trim();
-    highlight(titleElement.textContent, searchText);
+    var titleElement = element.querySelector('.eventTitle')
+    let titleText = titleElement.textContent
+    cleanHighlight(titleElement, titleText)
+    highlight(titleElement, searchText)
+    titleText = titleText.toLowerCase().trim()
 
-    var descElement = element.querySelector('.eventDescript');
-    var descText = descElement.textContent.toLowerCase().trim();
+    var descElement = element.querySelector('.eventDescript')
+    let descText = descElement.textContent
+    cleanHighlight(descElement, descText)
+    highlight(descElement, searchText)
+    descText = descText.toLowerCase().trim()
 
     return (titleText.indexOf(searchText) !== -1) || (descText.indexOf(searchText) !== -1);
   });
 };
 
-  const highlight = (evt, searchText) => {
-  console.log(evt);
-  console.log(searchText);
+  const highlight = (element, text) => {
+    let oldHtml = element.innerHTML
+    var re = new RegExp(text,"ig");
+    const newHtml = oldHtml.replace(re, (match) => `<span class="highlight">${match}</span>`)
+    element.innerHTML = newHtml
+  };
 
-  // var child = document.getElementById("title_info");
-  // if(child.textContent == evt){
-  //   child.classList.add("highlight");
-  // }
-
-  var child = document.getElementById("title_info");
-  var span = document.createElement("span");
-  span.id = "title_info"
-  span.className = "highlight";
-  var newNode = document.createTextNode(evt);
-  span.appendChild(newNode);
-  child.replaceWith(span);
-
-};
+  const cleanHighlight = (element, text) => {
+    text = text.replace('<span class="highlight">', '')
+    text = text.replace('</span>', '')
+    element.innerHTML = text
+  }
 
 // document.addEventListener('DOMContentLoaded', function () {
 //     window.demo = new Demo(document.getElementById('grid'));

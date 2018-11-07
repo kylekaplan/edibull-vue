@@ -46,7 +46,7 @@
           <div class="info">
             <br>
             <div id="card_info">
-              <h5 class="eventTitle"><span id="title_info">{{event.title}}</span></h5>
+              <h5 class="eventTitle">{{event.title}}</h5>
             </div>
             <p class="eventDescript">{{event.freeFoodApproved[0]}}</p>
           </div>
@@ -147,6 +147,13 @@ export default {
 }
 
 </script>
+
+<style>
+.highlight{
+  background-color: rgb(255, 255, 0, 0.8);
+}
+</style>
+
 
 <style scoped>
 
