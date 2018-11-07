@@ -1,7 +1,5 @@
 import Shuffle from 'shufflejs'
 
-
-
 'use strict';
 
 // var Shuffle = window.Shuffle;
@@ -188,27 +186,36 @@ Demo.prototype._handleSearchKeyup = function (evt) {
       }
     }
 
+    // document.getElementById("highlight").style.backgroundColor = "yellow";
+
+
     var titleElement = element.querySelector('.eventTitle');
     var titleText = titleElement.textContent.toLowerCase().trim();
+    highlight(titleElement.textContent, searchText);
 
-    return titleText.indexOf(searchText) !== -1;
+    var descElement = element.querySelector('.eventDescript');
+    var descText = descElement.textContent.toLowerCase().trim();
+
+    return (titleText.indexOf(searchText) !== -1) || (descText.indexOf(searchText) !== -1);
   });
 };
 
-  const highlight = (evt) => {
+  const highlight = (evt, searchText) => {
   console.log(evt);
+  console.log(searchText);
+
+  // var child = document.getElementById("title_info");
+  // if(child.textContent == evt){
+  //   child.classList.add("highlight");
+  // }
 
   var child = document.getElementById("title_info");
-  child.classList.add("highlight");
-
-  // var span = document.createElement("span");
-  // // span.id = "title_info";
-  // var mark = document.createElement("mark");
-  // var newNode = document.createTextNode(evt);
-  // mark.appendChild(newNode);
-  // // span.appendChild(mark);
-  // // heading.appendChild(mark);
-  // child.replaceWith(mark);
+  var span = document.createElement("span");
+  span.id = "title_info"
+  span.className = "highlight";
+  var newNode = document.createTextNode(evt);
+  span.appendChild(newNode);
+  child.replaceWith(span);
 
 };
 
