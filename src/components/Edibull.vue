@@ -62,6 +62,8 @@ import axios from 'axios'
 import Demo from '../assets/shuffle-demo';
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+const grayPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='
+
 
 export default {
     name: 'Edibull',
@@ -75,14 +77,15 @@ export default {
       .then((response) => {
         this.events = response.data.events;
         console.log('this.events', this.events)
-        this.demo = new Demo(document.getElementById('grid'));
       }, (error) => {
-        // pass
+        console.log('axios err:', err)
       })
   },
   mounted () {
     console.log('mounted');
-    // this.demo = new Demo(document.getElementById('grid'));
+    this.demo = new Demo(document.getElementById('grid'));
+    console.log('initialized shuffle')
+
   },
   beforeDestroy () {
     // Dispose of shuffle when it will be removed from the DOM.
@@ -91,6 +94,8 @@ export default {
   },
   updated() {
     // Fired every second, should always be true
+    console.log('updated')
+    console.log('this.demo', this.demo)
     this.demo.shuffle.resetItems()
   },
   methods: {

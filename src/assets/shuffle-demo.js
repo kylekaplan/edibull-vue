@@ -9,7 +9,7 @@ var Demo = function (element) {
 
   this.shuffle = new Shuffle(element, {
     itemSelector: '.card',
-    // sizer: '.my-sizer-element',
+    columnWidth: 420
   });
 
   // Log events.
@@ -191,7 +191,7 @@ Demo.prototype._handleSearchKeyup = function (evt) {
 
     var titleElement = element.querySelector('.eventTitle');
     var titleText = titleElement.textContent.toLowerCase().trim();
-    highlight(titleElement.textContent, searchText);
+    // highlight(titleElement.textContent, searchText);
 
     var descElement = element.querySelector('.eventDescript');
     var descText = descElement.textContent.toLowerCase().trim();

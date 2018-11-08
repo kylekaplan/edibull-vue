@@ -18,10 +18,10 @@
     <div id="nav-bar">
       <!-- vue-router (link to separate page) -->
       <div class="hover">
-        <p><router-link to="/">EdiBull</router-link></p>
+        <p id="nav-button"><router-link to="/">EdiBull</router-link></p>
       </div>
       <div class="hover">
-        <p><router-link to="/portals">Portals</router-link></p>
+        <p id="nav-button"><router-link to="/portals">Portals</router-link></p>
       </div>
     </div>
     <router-view></router-view>
@@ -43,6 +43,11 @@ body {
 
 
 <style scoped>
+
+a {
+  color: black;
+}
+
 #logo {
   text-align: left;
   font-size: 80px;
