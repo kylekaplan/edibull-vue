@@ -212,8 +212,7 @@ Demo.prototype._handleSearchKeyup = function (evt) {
   };
 
   const cleanHighlight = (element, text) => {
-    text = text.replace('<span class="highlight">', '')
-    text = text.replace('</span>', '')
+    // remove the old highlight before appying new one...
     element.innerHTML = text
   }
 
