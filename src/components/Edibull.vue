@@ -1,40 +1,37 @@
 <template>
   <div>
- <!-- start copy -->
-        <div class="container">
-
-    <div class="row">
-      <div class="column left filters-group-wrap">
-        <div class="filters-group">
-          <div class="btn-group filter-options">
-            <button class="btn btn--primary" data-group="Speaker">Speaker</button>
-            <button class="btn btn--primary" data-group="Free Food">Free Food</button>
-            <button class="btn btn--primary" data-group="Fundraiser">Fundraiser</button>
-            <button class="btn btn--primary" data-group="Employment">Employment</button>
-            <button class="btn btn--primary" data-group="Volunteer">Volunteer</button>
+    <div class="container">
+      <div class="row">
+        <div class="column left filters-group-wrap">
+          <div class="filters-group">
+            <div class="btn-group filter-options">
+              <button class="btn btn--primary" data-group="Speaker">Speaker</button>
+              <button class="btn btn--primary" data-group="Free Food">Free Food</button>
+              <button class="btn btn--primary" data-group="Fundraiser">Fundraiser</button>
+              <button class="btn btn--primary" data-group="Employment">Employment</button>
+              <button class="btn btn--primary" data-group="Volunteer">Volunteer</button>
+            </div>
           </div>
+          <fieldset class="filters-group">
+            <div class="button-group sort-options">
+              <label class="button active">
+                <input type="radio" name="sort-value" value="dom"> Date
+              </label>
+              <label class="button">
+                <input type="radio" name="sort-value" value="title"> Title
+              </label>
+            </div>
+          </fieldset>
         </div>
-        <fieldset class="filters-group">
-          <div class="button-group sort-options">
-            <label class="button active">
-              <input type="radio" name="sort-value" value="dom"> Date
-            </label>
-            <label class="button">
-              <input type="radio" name="sort-value" value="title"> Title
-            </label>
+        <div class="column right">
+          <div id="look_up">
+          <div class="filters-group" id="search_bar">
+            <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events...">
           </div>
-        </fieldset>
-      </div>
-      <div class="column right">
-        <div id="look_up">
-        <div class="filters-group" id="search_bar">
-          <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events...">
-        </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-        <!-- end copy -->
       <div class="grid-container" id="grid">
         <div class="card" v-for="event in events" :key="event.id"
           :data-groups="get_group(event)"
@@ -42,14 +39,16 @@
           :data-title="event.title"
           >
           <a href="">
-          <font id="time">{{display_time(event)}}</font>
+          <font class="time">{{display_time(event)}}</font>
           <div class="photo">
             <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
           </div>
           <div class="info">
             <br>
-            <h5 class="eventTitle">{{event.title}}</h5>
-            <p>{{event.freeFoodApproved[0]}}</p>
+            <div id="card_info">
+              <h5 class="eventTitle">{{event.title}}</h5>
+            </div>
+            <p class="eventDescript">{{event.freeFoodApproved[0]}}</p>
           </div>
           </a>
         </div>
@@ -104,7 +103,6 @@ export default {
       return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
     },
     get_group(event){
-      console.log("get_group", event)
       if(event.speakerApproved.length > 0){
         return '["Speaker"]';
       } else if (event.employmentApproved.length > 0) {
@@ -120,7 +118,9 @@ export default {
     display_time(event) {
       const startUtcTime = new Date(event.dates[0].starts_at)
       var startTimeValue = this.getTime(startUtcTime)
-      return event.dates[0].starts_at.substring(5, 7) + "/" + event.dates[0].starts_at.substring(8, 10) + "/" + event.dates[0].starts_at.substring(2, 4) + " " + startTimeValue;
+      var months = ['Jan.', 'Feb.', 'March', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
+      var month = event.dates[0].starts_at.substring(5, 7);
+      return  months[month - 1] + " " + event.dates[0].starts_at.substring(8, 10) + " | " + startTimeValue;
     },
     // get time of event
     getTime (utcTime) {
@@ -143,7 +143,20 @@ export default {
 }
 </script>
 
+<style>
+.highlight{
+  background-color: rgb(255, 255, 0, 0.8);
+}
+</style>
+
+
 <style scoped>
+.highlight{
+  background-color: yellow;
+}
+.eventTitle {
+  color: rgb(42, 83, 49);
+}
 #search_bar {
   margin-top: 10px;
   float: right;
@@ -182,17 +195,19 @@ export default {
   padding: 2px 16px;
   text-align: center;
   margin-top: 30px;
+  color: black;
 }
 .photo {
   float: left;
 }
-#time {
+.time {
   font-size: 15px;
   float: right;
   margin-top: 20px;
   margin-right: 30px;
   margin-left: 40px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
+  color: black;
 }
 .btn {
   background-color: rgba(255, 255, 255, 0.726);

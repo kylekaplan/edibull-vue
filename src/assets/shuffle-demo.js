@@ -9,7 +9,7 @@ var Demo = function (element) {
 
   this.shuffle = new Shuffle(element, {
     itemSelector: '.card',
-    sizer: '.my-sizer-element',
+    // sizer: '.my-sizer-element',
   });
 
   // Log events.
@@ -69,7 +69,7 @@ Demo.prototype._handleFilterClick = function (evt) {
 
   // For this custom 'additive' mode in the demo, clicking on filter buttons
   // doesn't remove any other filters.
-  if (this.mode === 'additive') {
+  if (this.mode === 'exclusive') {
     // If this button is already active, remove it from the list of filters.
     if (isActive) {
       this._activeFilters.splice(this._activeFilters.indexOf(btnGroup));
@@ -178,6 +178,8 @@ Demo.prototype._handleSearchKeyup = function (evt) {
     if (shuffle.group !== Shuffle.ALL_ITEMS) {
       // Get the item's groups.
       var groups = JSON.parse(element.getAttribute('data-groups'));
+      // var groups2 = JSON.parse(element.getAttribute(''))
+      
       var isElementInCurrentGroup = groups.indexOf(shuffle.group) !== -1;
 
       // Only search elements in the current group
@@ -185,13 +187,45 @@ Demo.prototype._handleSearchKeyup = function (evt) {
         return false;
       }
     }
+    // document.getElementById("highlight").style.backgroundColor = "yellow";
 
-    var titleElement = element.querySelector('#eventTitle');
-    var titleText = titleElement.textContent.toLowerCase().trim();
 
-    return titleText.indexOf(searchText) !== -1;
+    // var titleElement = element.querySelector('.eventTitle')
+    // let titleText = titleElement.textContent
+    // cleanHighlight(titleElement, titleText)
+    // highlight(titleElement, searchText)
+    // titleText = titleText.toLowerCase().trim()
+
+    // var descElement = element.querySelector('.eventDescript')
+    // console.log('TCL: Demo.prototype._handleSearchKeyup -> descElement', descElement);
+    // let descText = descElement.textContent
+    // cleanHighlight(descElement, descText)
+    // highlight(descElement, searchText)
+    // descText = descText.toLowerCase().trim()
+
+    var portElement = element.querySelector('.portTitles')
+    // console.log('TCL: Demo.prototype._handleSearchKeyup -> portElement', portElement);
+    let portText = portElement.textContent
+    cleanHighlight(portElement, portText)
+    highlight(portElement, searchText)
+    portText = portText.toLowerCase().trim()
+
+    // titleText.indexOf(searchText) !== -1) || (descText.indexOf(searchText) !== -1
+    return (portText.indexOf(searchText) !== -1);
   });
 };
+
+  const highlight = (element, text) => {
+    let oldHtml = element.innerHTML
+    var re = new RegExp(text,"ig");
+    const newHtml = oldHtml.replace(re, (match) => `<span class="highlight">${match}</span>`)
+    element.innerHTML = newHtml
+  };
+
+  const cleanHighlight = (element, text) => {
+    // remove the old highlight before appying new one...
+    element.innerHTML = text
+  }
 
 // document.addEventListener('DOMContentLoaded', function () {
 //     window.demo = new Demo(document.getElementById('grid'));
