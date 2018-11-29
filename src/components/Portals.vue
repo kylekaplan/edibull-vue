@@ -28,26 +28,23 @@
             </div>
           </div> -->
 
+          <!-- Category buttons -->
           <div class="filters-group">
             <div class="btn-group filter-options">
               <button v-on:click="buttonActive(cat)" class="btn btn--primary" v-for="cat in categories" v-bind:data-group="cat.umbrella" :key="cat.umbrella">
                 {{cat.umbrella}}
               </button>
+
+              <!-- Nested subcategory buttons -->
+              <!-- <div class="filters-group">
+                <div class="btn-group filter-options">
+                  <button class="btn btn--primary" v-for="option in categories" v-bind:data-group="option.umbrella" v-bind:value="option.id" :key="option.umbrella">
+                  {{option.subCategories}}</button>
+                </div>
+              </div> -->
             </div>
           </div>
-          <div class="form-group filters-group">
-            <div class="btn-group filter-options">
-              <select v-on:change="onchange($event)" class="form-control" name="categories" id="categories" v-model="categories">
-                <option :value="null" disabled selected>Choose an umbrella</option>
-              </select>
-            </div>
-          </div>
-          <!-- <div class="filters-group">
-            <div class="btn-group filter-options">
-              <button v-on:click="buttonActive" class="btn btn--primary" v-for="option in categories" v-bind:data-group="option.umbrella" v-bind:value="option.id" :key="option.umbrella">
-              {{option.subCategories}}</button>
-            </div>
-          </div> -->
+         
 
           <!-- <div class="form-group filters-group">
             <div class="btn-group filter-options">
@@ -103,7 +100,6 @@ export default {
   data () {
     return {  
       // testing counter
-      isActive: false,
       category: null,
       portals: [],
       photos: [
@@ -326,23 +322,17 @@ export default {
         return '["No Name"]'
       }
     },
-    filterOut: function(items) {
-      return items.filter(function(item) {
-        return this.umbrella == this.category;
-      })
+    buttonActive: function(cat) {
+      // var attribute = event.target.getAttribute("data-group");
+      console.log("attribute::", cat);
+      // console.log ("actual button:: ", this.categories.attribute); 
     },
-    buttonActive: function(event) {
-      var attribute = event.target.getAttribute("data-group");
-      this.category = attribute;
-      console.log("attribute::", attribute);
-      
-    },
-    onchange: function(e) {
-      var btn = e.currentTarget
-      // $("#categories").find("option[data-group=Fraternity and Sorority Life]").addClass("active");
-      console.log("this.category_options.umbrella", this.categories);
-      alert(this.categories);
-    }
+    // onchange: function(e) {
+    //   var btn = e.currentTarget
+    //   // $("#categories").find("option[data-group=Fraternity and Sorority Life]").addClass("active");
+    //   console.log("this.category_options.umbrella", this.categories);
+    //   alert(this.categories);
+    // }
     /**
      * Fake and API request for a set of images.
      * @return {Promise<Object[]>} A promise which resolves with an array of objects.
