@@ -18,7 +18,7 @@
     <div id="nav-bar">
       <!-- vue-router (link to separate page) -->
       <div class="hover">
-        <p id="nav-button"><router-link to="/">EdiBull</router-link></p>
+        <p id="nav-button"><router-link to="/">Events</router-link></p>
       </div>
       <div class="hover">
         <p id="nav-button"><router-link to="/portals">Portals</router-link></p>
@@ -32,6 +32,7 @@
 
 export default {
   name: 'app',
+
 }
 </script>
 

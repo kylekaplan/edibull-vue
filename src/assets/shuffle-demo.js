@@ -10,6 +10,7 @@ var Demo = function (element) {
   this.shuffle = new Shuffle(element, {
     itemSelector: '.card',
     columnWidth: 420
+    // speed: 2000
   });
 
   // Log events.
@@ -64,20 +65,35 @@ Demo.prototype._handleFilterClick = function (evt) {
   var btn = evt.currentTarget;
   var isActive = btn.classList.contains('active');
   var btnGroup = btn.getAttribute('data-group');
+  var all = document.getElementById('all');
 
   // You don't need _both_ of these modes. This is only for the demo.
-
   // For this custom 'additive' mode in the demo, clicking on filter buttons
   // doesn't remove any other filters.
   if (this.mode === 'additive') {
     // If this button is already active, remove it from the list of filters.
-    if (isActive) {
+
+    if (btnGroup === 'all'){
+      this._removeActiveClassFromChildren(btn.parentNode);
+      this._activeFilters = [];
+      btn.classList.toggle('active');
+      this.shuffle.filter(Shuffle.ALL_ITEMS);
+
+    } else if (isActive) {
+      //FIX: splice removes everything after the the index in array
       this._activeFilters.splice(this._activeFilters.indexOf(btnGroup));
+      if(this._activeFilters[0] == null) {
+        all.classList.toggle('active');
+      }
+      btn.classList.toggle('active');
+
     } else {
       this._activeFilters.push(btnGroup);
+      if(all.classList.contains('active')){
+        all.classList.toggle('active');
+      }
+      btn.classList.toggle('active');
     }
-
-    btn.classList.toggle('active');
 
     // Filter elements
     this.shuffle.filter(this._activeFilters);
@@ -95,8 +111,13 @@ Demo.prototype._handleFilterClick = function (evt) {
       filterGroup = btnGroup;
     }
 
+    if(all.classList.contains('active')){
+      all.classList.toggle('active');
+    }
+    
     this.shuffle.filter(filterGroup);
   }
+  console.log(this._activeFilters)
 };
 
 Demo.prototype._removeActiveClassFromChildren = function (parent) {
@@ -118,7 +139,6 @@ Demo.prototype.addSorting = function () {
 
 Demo.prototype._handleSortChange = function (evt) {
   // Add and remove `active` class from buttons.
-  var wrapper = evt.currentTarget;
   var buttons = Array.from(evt.currentTarget.children);
   buttons.forEach(function (button) {
     if (button.querySelector('input').value === evt.target.value) {
@@ -186,38 +206,37 @@ Demo.prototype._handleSearchKeyup = function (evt) {
       }
     }
 
-    // document.getElementById("highlight").style.backgroundColor = "yellow";
+    var titleElement = element.querySelector('.eventTitle')
+    let titleText = titleElement.textContent
+    cleanHighlight(titleElement, titleText)
+    highlight(titleElement, searchText)
+    titleText = titleText.toLowerCase().trim()
 
-
-    var titleElement = element.querySelector('.eventTitle');
-    var titleText = titleElement.textContent.toLowerCase().trim();
-    // highlight(titleElement.textContent, searchText);
-
-    var descElement = element.querySelector('.eventDescript');
-    var descText = descElement.textContent.toLowerCase().trim();
+    var descElement = element.querySelector('.eventDescript')
+    let descText = descElement.textContent
+    cleanHighlight(descElement, descText)
+    highlight(descElement, searchText)
+    descText = descText.toLowerCase().trim()
 
     return (titleText.indexOf(searchText) !== -1) || (descText.indexOf(searchText) !== -1);
   });
 };
 
-  const highlight = (evt, searchText) => {
-  console.log(evt);
-  console.log(searchText);
+  const highlight = (element, text) => {
+    let oldHtml = element.innerHTML
+    var re = new RegExp(text,"ig");
+    const newHtml = oldHtml.replace(re, (match) => `<span class="highlight">${match}</span>`)
+    element.innerHTML = newHtml
+  };
 
-  // var child = document.getElementById("title_info");
-  // if(child.textContent == evt){
-  //   child.classList.add("highlight");
-  // }
-
-  var child = document.getElementById("title_info");
-  var span = document.createElement("span");
-  span.id = "title_info"
-  span.className = "highlight";
-  var newNode = document.createTextNode(evt);
-  span.appendChild(newNode);
-  child.replaceWith(span);
-
-};
+  const cleanHighlight = (element, text) => {
+    // remove the old highlight before appying new one...
+    console.log(text);
+    text = text.replace('<span class="highlight">', '')
+    text = text.replace('</span>', '')
+    console.log(text);
+    element.innerHTML = text
+  };
 
 // document.addEventListener('DOMContentLoaded', function () {
 //     window.demo = new Demo(document.getElementById('grid'));

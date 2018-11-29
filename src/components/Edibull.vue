@@ -4,7 +4,9 @@
       <div class="row">
         <div class="column left filters-group-wrap">
           <div class="filters-group">
+            <!-- Filter buttons -->
             <div class="btn-group filter-options">
+              <button class="btn btn--primary active" id="all" data-group="All">All</button>
               <button class="btn btn--primary" data-group="Speaker">Speaker</button>
               <button class="btn btn--primary" data-group="Free Food">Free Food</button>
               <button class="btn btn--primary" data-group="Fundraiser">Fundraiser</button>
@@ -13,6 +15,7 @@
             </div>
           </div>
           <fieldset class="filters-group">
+            <!-- Date and Title filter -->
             <div class="button-group sort-options">
               <label class="button active">
                 <input type="radio" name="sort-value" value="dom"> Date
@@ -24,33 +27,45 @@
           </fieldset>
         </div>
         <div class="column right">
+          <!-- Search Bar -->
           <div id="look_up">
           <div class="filters-group" id="search_bar">
-            <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events...">
+            <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events, Organizations, or Descriptions...">
           </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- Grid containing all cards -->
       <div class="grid-container" id="grid">
+        <!-- wrapper for each card, cycles through events to get info -->
         <div class="card" v-for="event in events" :key="event.id"
           :data-groups="get_group(event)"
           :data-date='[event.dates[0].starts_at.substr(0, 10)]'
           :data-title="event.title"
           >
-          <a href="">
-          <font class="time">{{display_time(event)}}</font>
+          <!-- inner card wrapper -->
+          <div class="card_wrap" v-on:click="display_card($event)">
+          <!-- "more" class = info to be displayed on click -->
+          <font class="time">{{time_preview(event)}}<span class="more"> - {{display_time(event)}}</span></font>
           <div class="photo">
-            <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
+            <img alt="Event Photo" class="eventPhoto" :src="get_photo(event)">
           </div>
           <div class="info">
             <br>
             <div id="card_info">
-              <h5 class="eventTitle"><span id="title_info">{{event.title}}</span></h5>
+              <span class="preview"><h5 class="eventTitle">{{event.title}}</h5></span>
+              <span class="more"><h2 class="eventTitle">{{event.title}}</h2></span>
+              <span class="more"><h3>Location: {{event.location}}</h3></span>
+              <span class="more"><h3>Hosted by: <a :href="event.portal.links.web">{{event.portal.name}}</a></h3></span>
             </div>
-            <p class="eventDescript">{{event.freeFoodApproved[0]}}</p>
+            <div id="description">
+            <p class="eventDescript"><span class="preview">{{event.freeFoodApproved[0]}}</span>
+              <span class="more">{{event.description}}</span>
+              </p>
+            </div>
           </div>
-          </a>
+          </div>
         </div>
       </div>
   </div>
@@ -58,11 +73,7 @@
 
 <script> 
 import axios from 'axios'
-// import Shuffle from 'shufflejs'
 import Demo from '../assets/shuffle-demo';
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-const grayPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='
 
 
 export default {
@@ -82,10 +93,8 @@ export default {
       })
   },
   mounted () {
-    console.log('mounted');
     this.demo = new Demo(document.getElementById('grid'));
-    console.log('initialized shuffle')
-
+    this.demo.shuffle.update();
   },
   beforeDestroy () {
     // Dispose of shuffle when it will be removed from the DOM.
@@ -94,13 +103,11 @@ export default {
   },
   updated() {
     // Fired every second, should always be true
-    console.log('updated')
-    console.log('this.demo', this.demo)
     this.demo.shuffle.resetItems()
   },
   methods: {
-    // get photo for event
-    get_photo(event) {
+    
+    get_photo(event) { // get time of event
       if (event.thumbnail_url != null) {
           return event.thumbnail_url;
       } else if(event.portal.picture_url != null) {
@@ -108,7 +115,7 @@ export default {
       }
       return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
     },
-    get_group(event){
+    get_group(event){ //assign card a group
       if(event.speakerApproved.length > 0){
         return '["Speaker"]';
       } else if (event.employmentApproved.length > 0) {
@@ -121,7 +128,7 @@ export default {
         return '["Free Food"]';
       }
     },
-    display_time(event) {
+    time_preview(event) { //display month, day, and start time
       const startUtcTime = new Date(event.dates[0].starts_at)
       var startTimeValue = this.getTime(startUtcTime)
       var months = ['Jan.', 'Feb.', 'March', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
@@ -129,8 +136,14 @@ export default {
 
       return  months[month - 1] + " " + event.dates[0].starts_at.substring(8, 10) + " | " + startTimeValue;
     },
-    // get time of event
-    getTime (utcTime) {
+
+    display_time(event){ //display month, day, start and end times
+      const endUtcTime = new Date(event.dates[0].ends_at)
+      var endTimeValue = this.getTime(endUtcTime)
+      return endTimeValue;
+    },
+    
+    getTime (utcTime) { // get time of event
       const hours = Number(utcTime.getHours())
       const minutes = Number(utcTime.getMinutes())
 
@@ -146,26 +159,84 @@ export default {
 
       timeValue += (minutes < 10) ? `:0${minutes}` : `:${minutes}` // get minutes
       timeValue += (hours >= 12) ? 'pm' : 'am' // get AM/PM
-      return timeValue
+      return timeValue;
+    },
+
+    display_card(e) { //display big card on click
+
+      var card = e.target.closest('.card'); //find wrapper
+
+      card.classList.add('active'); //add active to class of card
+
+      //create big card
+      var fsmactual = document.createElement("div");
+      fsmactual.setAttribute('class', 'fsm_actual');
+      var fsminner = document.createElement("div");
+      fsminner.setAttribute('class', 'fsm_inner');
+      var temp = card.cloneNode(true);
+
+      //create exit button and style it
+      var btn = document.createElement("BUTTON");
+      btn.setAttribute('class', 'exit');
+      btn.appendChild(document.createTextNode("x"));
+      btn.style.backgroundColor = "rgb(42, 83, 49)";
+      btn.style.color = "white";
+      btn.style.borderRadius = "10px";
+      btn.style.position = "absolute";
+      btn.style.marginTop = "5px";
+      btn.style.marginLeft = "15px";
+      btn.style.height = "38px";
+      btn.style.width = "40px";
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+
+      //style big card
+      temp.style.cssText = "";
+      temp.style.position="fixed";
+      temp.style.top=0;
+      temp.style.left=0;
+
+      //add exit button to card clone, then send clone to body 
+      temp.insertBefore(btn, temp.childNodes[0]);
+      fsminner.appendChild(temp);
+      fsmactual.appendChild(fsminner);
+      document.body.appendChild(fsmactual);
+      btn.addEventListener("click", back_out); //add back_out function to exit button
     },
   }
 }
 
+var back_out = function(){ //deletes big card
+      var fsmActual = document.getElementsByClassName("fsm_actual");
+      fsmActual[0].remove();
+    }
+
 </script>
+
+<style>
+
+.highlight{
+  background-color: rgb(255, 255, 0, 0.8);
+}
+</style>
+
 
 <style scoped>
 
-.highlight{
-  background-color: yellow;
+.eventPhoto {
+  height:150px;
+  border-radius:50%; 
+  margin:10px;
+}
+
+/*hides content in more*/
+.more { 
+  display: none;
+  overflow: hidden;
 }
 
 .eventTitle {
   color: rgb(42, 83, 49);
-}
-
-#search_bar {
-  margin-top: 10px;
-  float: right;
 }
 
 .column {
@@ -190,14 +261,31 @@ export default {
   padding: 5px;
 }
 
+input[type=search] {
+    width: 130px;
+    margin-top: 15px;
+    float: right;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    -webkit-transition: width 0.8s ease-in-out;
+    transition: width 0.4s ease-in-out; 
+}
+
+input[type=search]:focus {
+    width: 80%;
+}
+
 .card {
   box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
-  transition:0.4s;
+  
   background: rgba(255, 255, 255, 0.712);
   margin: 10px;
   width: 400px;
   overflow: hidden;
   border-radius: 30px;
+  cursor: pointer;
 }
 
 .card:hover{
@@ -250,4 +338,46 @@ export default {
 .button {
   margin-right: 15px;
 }
+
+.fsm_actual {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.fsm_actual .active{
+  transition: all 2s ease-in-out;  
+  height: 95%;
+  width: 98%;
+  z-index: 100;
+  margin-top: 10px;
+  background-color: white;
+  cursor: auto; 
+  font-size: 25px;
+}
+
+.fsm_actual .active .eventPhoto {
+  height: 300px;
+  margin: 50px 20px 25px 25px;
+  border-radius: 10px;
+}
+
+.fsm_actual .active .preview {
+  display: none;
+  overflow: hidden;
+}
+
+.fsm_actual .active .more {
+  display: inline;
+}
+
+.fsm_actual .active:hover{
+  box-shadow: none;
+}
+
+#backout {
+  float:right;
+  margin: 10px 20px 10px 0px;
+}
+
 </style>
