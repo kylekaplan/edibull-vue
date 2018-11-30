@@ -94,8 +94,10 @@ export default {
   },
   mounted () {
     this.demo = new Demo(document.getElementById('grid'));
+    this.demo.shuffle.options.columnWidth = "42";
     this.demo.shuffle.update();
   },
+  
   beforeDestroy () {
     // Dispose of shuffle when it will be removed from the DOM.
     this.demo.shuffle.destroy();
@@ -279,7 +281,6 @@ input[type=search]:focus {
 
 .card {
   box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
-  
   background: rgba(255, 255, 255, 0.712);
   margin: 10px;
   width: 400px;
@@ -347,13 +348,14 @@ input[type=search]:focus {
 
 .fsm_actual .active{
   transition: all 2s ease-in-out;  
-  height: 95%;
+  height: 98%;
   width: 98%;
   z-index: 100;
   margin-top: 10px;
   background-color: white;
-  cursor: auto; 
   font-size: 25px;
+  overflow: auto;
+
 }
 
 .fsm_actual .active .eventPhoto {

@@ -8,9 +8,7 @@ var Demo = function (element) {
   this.element = element;
 
   this.shuffle = new Shuffle(element, {
-    itemSelector: '.card',
-    columnWidth: 420
-    // speed: 2000
+    itemSelector: '.card'
   });
 
   // Log events.
@@ -73,7 +71,7 @@ Demo.prototype._handleFilterClick = function (evt) {
   if (this.mode === 'additive') {
     // If this button is already active, remove it from the list of filters.
 
-    if (btnGroup === 'all'){
+    if (btn == all){
       this._removeActiveClassFromChildren(btn.parentNode);
       this._activeFilters = [];
       btn.classList.toggle('active');
@@ -81,7 +79,7 @@ Demo.prototype._handleFilterClick = function (evt) {
 
     } else if (isActive) {
       //FIX: splice removes everything after the the index in array
-      this._activeFilters.splice(this._activeFilters.indexOf(btnGroup));
+      this._activeFilters.splice(this._activeFilters.indexOf(btnGroup), 1);
       if(this._activeFilters[0] == null) {
         all.classList.toggle('active');
       }
@@ -117,7 +115,6 @@ Demo.prototype._handleFilterClick = function (evt) {
     
     this.shuffle.filter(filterGroup);
   }
-  console.log(this._activeFilters)
 };
 
 Demo.prototype._removeActiveClassFromChildren = function (parent) {
@@ -217,6 +214,15 @@ Demo.prototype._handleSearchKeyup = function (evt) {
     cleanHighlight(descElement, descText)
     highlight(descElement, searchText)
     descText = descText.toLowerCase().trim()
+
+    // portal search
+    // var portElement = element.querySelector('.portTitles')
+    // let portText = portElement.textContent
+    // cleanHighlight(portElement, portText)
+    // highlight(portElement, searchText)
+    // portText = portText.toLowerCase().trim()
+
+    // return (portText.indexOf(searchText) !== -1);
 
     return (titleText.indexOf(searchText) !== -1) || (descText.indexOf(searchText) !== -1);
   });
