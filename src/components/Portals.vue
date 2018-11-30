@@ -220,16 +220,8 @@ export default {
     },
     get_portal(port){
       try {
-        var subName = port.category.name;
-        console.log("subName", portName);
-        if (this.catPressed) {
-          if (subName !== undefined) {
-            return  '["' + subName + '"]'
-          } else {
-            return '["Others"]'
-          }
-        }
         var umbrellaName = port.umbrella.name;
+        // console.log('umbrella name:', umbrellaName);
         if (umbrellaName !== undefined) {
           return  '["' + umbrellaName + '"]'
         } else {
