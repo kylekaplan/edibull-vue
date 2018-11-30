@@ -69,7 +69,7 @@ Demo.prototype._handleFilterClick = function (evt) {
 
   // For this custom 'additive' mode in the demo, clicking on filter buttons
   // doesn't remove any other filters.
-  if (this.mode === 'exclusive') {
+  if (this.mode === 'additive') {
     // If this button is already active, remove it from the list of filters.
     if (isActive) {
       this._activeFilters.splice(this._activeFilters.indexOf(btnGroup));
