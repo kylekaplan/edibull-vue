@@ -11,6 +11,7 @@
             </div>
           </div>
         </div>
+        <br>
         <div class="row">
           <!-- Category buttons -->
           <div class="filters-group">
@@ -19,6 +20,8 @@
                 {{cat}}
               </button>
             </div>
+            <br>
+            <br>
             <!-- subcategory buttons -->
             <div class="filters-group" v-if="pressed.length > 0">
               <div class="btn-group filter-options">
@@ -69,6 +72,7 @@ export default {
       loaded: false,
       pressed: [],
       subCat: [],
+      catPressed: null,
       categories: [
         'Fraternity and Sorority Life',
         'Service', 
@@ -113,110 +117,65 @@ export default {
             "Administrative",
             "Sport Club", 
           ]
+        },
+        'Student Life' : {
+          subCategories: [
+            "Academic",
+            "Departmental",
+            "Faith-Based",
+            "Other",
+            "Special Interest",
+            "University",
+          ]
+        },
+        'Student Organizations' : {
+          subCategories: [
+            "Academic & Professional",
+            "Campus-Wide",
+            "Councils",
+            "Graduate",
+            "Honor",
+            "International",
+            "Multicultural",
+            "Political",
+            "Recreational",
+            "Religious",
+            "Service- Animal Welfare",
+            "Service- Community Development", 
+            "Service- Environmental",
+            "Service- General",
+            "Service- Health Care",
+            "Service- Hunger & Homelessness",
+            "Service- Senior Citizen Care",
+            "Service- Social Justice",
+            "Service- Youth & Education",
+            "Social Justice",
+            "Special Interest",
+          ]
+        },
+        'USF Health Morsani College of Medicine' : {
+          subCategories: [
+            "Academic/Professional",
+            "Cultural",
+            "Departmental",
+            "Graduate",
+            "International",
+            "Religious",
+            "Service",
+            "Special Interest",
+            "Student Governance",
+          ]
+        },
+        'Umbrella' : {
+          subCategories: [
+            "Academic/Professional", 
+            "Campus-Wide",
+            "Departmental", 
+            "University", 
+            "University (Community Partners)", 
+          ]
         }
-      },
-      // everything: [
-      //   {
-      //     'Fraternity and Sorority Life': 'Fraternity and Sorority Life',
-      //     subCategories: [
-      //       "Council", 
-      //       "Honor Society",
-      //       "Interfraternity Council",
-      //       "Multicultural Greek Council",
-      //       "National Pan-Hellenic Council",
-      //       "Panhellenic Association",
-      //     ]
-      //   },
-      //   {
-      //     umbrella: 'Service',
-      //     subCategories: [
-      //       "Animals (Community Partners)",
-      //       "Culture Awareness (Community Partners)",
-      //       "Disabilities(Community Partners)",
-      //       "Disaster Relief (Community Partners)",
-      //       "Education/Literacy (Community Partners)",
-      //       "Environmental (Community Partners)",
-      //       "Family Services (Community Partners)",
-      //       "General Service (Community Partners)",
-      //       "Health & Wellness (Community Partners)",
-      //       "Hunger & Homelessness Services (Community Partners)",
-      //       "Hunger & Nutrition (Community Partners)",
-      //       "Political Engagement (Community Partners)",
-      //       "Senior Citizen (Community Partners)",
-      //       "Veterans (Community Partners)",
-      //       "Youth Development (Community Partners)",
-      //     ]
-      //   },
-      //      {
-      //     umbrella: 'Sport Clubs',
-      //     subCategories: [
-      //       "Administrative",
-      //       "Sport Club", 
-      //     ]
-      //   },
-      //   {
-      //     umbrella: 'Student Life',
-      //     subCategories: [
-      //       "Academic",
-      //       "Departmental",
-      //       "Faith-Based",
-      //       "Other",
-      //       "Special Interest",
-      //       "University",
-      //     ]
-      //   },
-      //   {
-      //     umbrella: 'Student Organizations',
-      //     subCategories: [
-      //       "Academic & Professional",
-      //       "Campus-Wide",
-      //       "Councils",
-      //       "Graduate",
-      //       "Honor",
-      //       "International",
-      //       "Multicultural",
-      //       "Political",
-      //       "Recreational",
-      //       "Religious",
-      //       "Service- Animal Welfare",
-      //       "Service- Community Development", 
-      //       "Service- Environmental",
-      //       "Service- General",
-      //       "Service- Health Care",
-      //       "Service- Hunger & Homelessness",
-      //       "Service- Senior Citizen Care",
-      //       "Service- Social Justice",
-      //       "Service- Youth & Education",
-      //       "Social Justice",
-      //       "Special Interest",
-      //     ]
-      //   },
-      //   {
-      //     umbrella: 'USF Health Morsani College of Medicine', 
-      //     subCategories: [
-      //       "Academic/Professional",
-      //       "Cultural",
-      //       "Departmental",
-      //       "Graduate",
-      //       "International",
-      //       "Religious",
-      //       "Service",
-      //       "Special Interest",
-      //       "Student Governance",
-      //     ]
-      //   },
-      //   {
-      //     umbrella: 'Umbrella',
-      //     subCategories: [
-      //       "Academic/Professional", 
-      //       "Campus-Wide",
-      //       "Departmental", 
-      //       "University", 
-      //       "University (Community Partners)", 
-      //     ]
-      //   }
-      // ],
-      
+      },      
     }
   },
   created () {
@@ -261,17 +220,18 @@ export default {
     },
     get_portal(port){
       try {
+        var subName = port.category.name;
+        console.log("subName", portName);
+        if (this.catPressed) {
+          if (subName !== undefined) {
+            return  '["' + subName + '"]'
+          } else {
+            return '["Others"]'
+          }
+        }
         var umbrellaName = port.umbrella.name;
         if (umbrellaName !== undefined) {
           return  '["' + umbrellaName + '"]'
-        } else {
-          return '["Others"]'
-        }
-
-        var subName = port.category.name;
-        console.log("subName", portName);
-        if (subName !== undefined) {
-          return  '["' + subName + '"]'
         } else {
           return '["Others"]'
         }
@@ -291,17 +251,18 @@ export default {
         if (this.pressed[i] == attribute) {
           this.pressed.splice(i, 1);
           inArray = true;
+          this.subCat = this.everything[this.pressed[(this.pressed.length-1)]].subCategories;
         }
       }
       if (!inArray) {
         this.pressed.push(attribute);
+        this.subCat = this.everything[attribute].subCategories;
       }
       inArray = false;
       console.log("pressed array", this.pressed);
-      
-      console.log('everything', this.everything)
-      this.subCat = this.everything[attribute].subCategories;
-      console.log("subCat array", this.subCat);
+
+      // if buttons pressed, set bool catButtons true
+      this.catPressed = event.target.classList.contains('active');
     },
   },
 }
