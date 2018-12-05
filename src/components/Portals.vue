@@ -16,6 +16,7 @@
           <!-- Category buttons -->
           <div class="filters-group">
             <div class="btn-group filter-options">
+              <button v-on:click="buttonActive(cat, $event)" class="btn btn--primary active" id="all" data-group="All">All</button>
               <button v-on:click="buttonActive(cat, $event)" class="btn btn--primary" v-for="cat in categories" v-bind:data-group="cat" :key="cat">
                 {{cat}}
               </button>
@@ -243,18 +244,25 @@ export default {
       console.log("attribute::", cat);
       console.log ("actual button:: ", attribute); 
 
-      // check if pressed attribute is in pressed array 
-      var inArray = false;
-      for (var i = 0; i < this.pressed.length; i++) {
-        if (this.pressed[i] == attribute) {
-          this.pressed.splice(i, 1);
-          inArray = true;
-          this.subCat = this.everything[this.pressed[(this.pressed.length-1)]].subCategories;
-        }
+      if(attribute == 'All') {
+        this.pressed.splice(0, this.pressed.length);
+        this.subCat.splice(0, this.subCat.length);
       }
-      if (!inArray) {
-        this.pressed.push(attribute);
-        this.subCat = this.everything[attribute].subCategories;
+      else {
+        // check if pressed attribute is in pressed array 
+        var inArray = false;
+        for (var i = 0; i < this.pressed.length; i++) {
+          if (this.pressed[i] == attribute) {
+            this.pressed.splice(i, 1);
+            inArray = true;
+            this.subCat = this.everything[this.pressed[(this.pressed.length-1)]].subCategories;
+          }
+        }
+        if (!inArray) {
+          this.pressed.push(attribute);
+          this.subCat = this.everything[attribute].subCategories;
+        }
+
       }
       inArray = false;
       console.log("pressed array", this.pressed);
