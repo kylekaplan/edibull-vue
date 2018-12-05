@@ -11,19 +11,25 @@
             </div>
           </div>
         </div>
+        <br>
         <div class="row">
-
           <!-- Category buttons -->
           <div class="filters-group">
             <div class="btn-group filter-options">
-              <button v-on:click="buttonActive(cat)" class="btn btn--primary" v-for="cat in categories" v-bind:data-group="cat.umbrella" :key="cat.umbrella">
-                {{cat.umbrella}}
+              <button v-on:click="buttonActive(cat, $event)" class="btn btn--primary" v-for="cat in categories" v-bind:data-group="cat" :key="cat">
+                {{cat}}
               </button>
-
+            </div>
+            <br>
+            <br>
+            <!-- subcategory buttons -->
+            <div class="filters-group" v-if="pressed.length > 0">
+              <div class="btn-group filter-options">
+                <button class="btn btn--primary" v-for="sub in subCat" v-bind:data-group="sub" :key="sub">
+                  {{sub}}</button>
+              </div>
             </div>
           </div>
-
-          <p>{{category}} button was pressed</p>
         </div>
       </div>
       <div class="grid-container" id="grid">
@@ -63,8 +69,6 @@ export default {
   name: 'Portals',
   data () {
     return {  
-      // testing counter
-      category: null,
       portals: [],
       photos: [
         { id: 1, src: grayPixel  },
@@ -72,11 +76,20 @@ export default {
         { id: 3, src: greenPixel },
       ],
       loaded: false,
-      // categories: null,
-      // subcategories: null,
+      pressed: [],
+      subCat: [],
+      catPressed: null,
       categories: [
-        {
-          umbrella: 'Fraternity and Sorority Life',
+        'Fraternity and Sorority Life',
+        'Service', 
+        'Sport Clubs',  
+        'Student Life',
+        'Student Organizations', 
+        'USF Health Morsani College of Medicine', 
+        'Umbrella',
+      ],
+      everything: {
+        'Fraternity and Sorority Life': {
           subCategories: [
             "Council", 
             "Honor Society",
@@ -86,8 +99,7 @@ export default {
             "Panhellenic Association",
           ]
         },
-        {
-          umbrella: 'Service',
+        'Service': {
           subCategories: [
             "Animals (Community Partners)",
             "Culture Awareness (Community Partners)",
@@ -106,19 +118,70 @@ export default {
             "Youth Development (Community Partners)",
           ]
         },
-        {
-          umbrella: 'Student Life',
+        'Sport Clubs' : {
+          subCategories: [
+            "Administrative",
+            "Sport Club", 
+          ]
         },
-        {
-          umbrella: 'Student Organizations',
+        'Student Life' : {
+          subCategories: [
+            "Academic",
+            "Departmental",
+            "Faith-Based",
+            "Other",
+            "Special Interest",
+            "University",
+          ]
         },
-        {
-          umbrella: 'USF Health Morsani College of Medicine',
+        'Student Organizations' : {
+          subCategories: [
+            "Academic & Professional",
+            "Campus-Wide",
+            "Councils",
+            "Graduate",
+            "Honor",
+            "International",
+            "Multicultural",
+            "Political",
+            "Recreational",
+            "Religious",
+            "Service- Animal Welfare",
+            "Service- Community Development", 
+            "Service- Environmental",
+            "Service- General",
+            "Service- Health Care",
+            "Service- Hunger & Homelessness",
+            "Service- Senior Citizen Care",
+            "Service- Social Justice",
+            "Service- Youth & Education",
+            "Social Justice",
+            "Special Interest",
+          ]
         },
-        {
-          umbrella: 'Umbrella',
+        'USF Health Morsani College of Medicine' : {
+          subCategories: [
+            "Academic/Professional",
+            "Cultural",
+            "Departmental",
+            "Graduate",
+            "International",
+            "Religious",
+            "Service",
+            "Special Interest",
+            "Student Governance",
+          ]
+        },
+        'Umbrella' : {
+          subCategories: [
+            "Academic/Professional", 
+            "Campus-Wide",
+            "Departmental", 
+            "University", 
+            "University (Community Partners)", 
+          ]
         }
-      ],
+      },
     }
   },
 
@@ -151,7 +214,6 @@ export default {
     // console.log('updated')
   },
   methods: {
-
     //get photo for portal
     get_photo(port) {
       if (port.picture_url === "https://edibullapp.com/no-image.jpg") {
@@ -176,10 +238,29 @@ export default {
         return '["No Name"]'
       }
     },
-    buttonActive: function(cat) {
-      // var attribute = event.target.getAttribute("data-group");
+    buttonActive: function(cat, event) {
+      var attribute = event.target.getAttribute("data-group");
       console.log("attribute::", cat);
-      // console.log ("actual button:: ", this.categories.attribute); 
+      console.log ("actual button:: ", attribute); 
+
+      // check if pressed attribute is in pressed array 
+      var inArray = false;
+      for (var i = 0; i < this.pressed.length; i++) {
+        if (this.pressed[i] == attribute) {
+          this.pressed.splice(i, 1);
+          inArray = true;
+          this.subCat = this.everything[this.pressed[(this.pressed.length-1)]].subCategories;
+        }
+      }
+      if (!inArray) {
+        this.pressed.push(attribute);
+        this.subCat = this.everything[attribute].subCategories;
+      }
+      inArray = false;
+      console.log("pressed array", this.pressed);
+
+      // if buttons pressed, set bool catButtons true
+      this.catPressed = event.target.classList.contains('active');
     },
 
     display_card(e) { //display big card on click
