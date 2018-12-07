@@ -78,7 +78,6 @@ Demo.prototype._handleFilterClick = function (evt) {
       this.shuffle.filter(Shuffle.ALL_ITEMS);
 
     } else if (isActive) {
-      //FIX: splice removes everything after the the index in array
       this._activeFilters.splice(this._activeFilters.indexOf(btnGroup), 1);
       if(this._activeFilters[0] == null) {
         all.classList.toggle('active');
@@ -150,14 +149,14 @@ Demo.prototype._handleSortChange = function (evt) {
   var options = {};
 
   function sortByDate(element) {
-    return element.getAttribute('data-created');
+    return element.getAttribute('data-date');
   }
 
   function sortByTitle(element) {
     return element.getAttribute('data-title').toLowerCase();
   }
 
-  if (value === 'date-created') {
+  if (value === 'date-date') {
     options = {
       reverse: true,
       by: sortByDate,

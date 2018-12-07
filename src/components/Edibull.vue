@@ -7,11 +7,11 @@
             <!-- Filter buttons -->
             <div class="btn-group filter-options">
               <button class="btn btn--primary active" id="all" data-group="All">All</button>
-              <button class="btn btn--primary" data-group="Speaker">Speaker</button>
-              <button class="btn btn--primary" data-group="Free Food">Free Food</button>
-              <button class="btn btn--primary" data-group="Fundraiser">Fundraiser</button>
-              <button class="btn btn--primary" data-group="Employment">Employment</button>
-              <button class="btn btn--primary" data-group="Volunteer">Volunteer</button>
+              <button class="btn btn--primary" data-group="speaker">Speaker</button>
+              <button class="btn btn--primary" data-group="freeFood">Free Food</button>
+              <button class="btn btn--primary" data-group="fundraise">Fundraiser</button>
+              <button class="btn btn--primary" data-group="employment">Employment</button>
+              <button class="btn btn--primary" data-group="volunteer">Volunteer</button>
             </div>
           </div>
           <fieldset class="filters-group">
@@ -29,9 +29,10 @@
         <div class="column right">
           <!-- Search Bar -->
           <div id="look_up">
-          <div class="filters-group" id="search_bar">
-            <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events, Organizations, or Descriptions...">
-          </div>
+            <div class="filters-group" id="search_bar">
+              <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Events, Organizations, or Descriptions..." />
+              <!-- <span class="search_icon"></span> -->
+            </div>
           </div>
         </div>
       </div>
@@ -39,17 +40,17 @@
     <!-- Grid containing all cards -->
       <div class="grid-container" id="grid">
         <!-- wrapper for each card, cycles through events to get info -->
-        <div class="card" v-for="event in events" :key="event.id"
-          :data-groups="get_group(event)"
-          :data-date='[event.dates[0].starts_at.substr(0, 10)]'
+        <div class="card" v-for="event in events" :key="event.occurrenceId"
+          :data-groups='get_group(event)'
+          :data-date="event.starts_at.substr(0, 10)"
           :data-title="event.title"
           >
           <!-- inner card wrapper -->
           <div class="card_wrap" v-on:click="display_card($event)">
           <!-- "more" class = info to be displayed on click -->
-          <font class="time">{{time_preview(event)}}<span class="more"> - {{display_time(event)}}</span></font>
+          <font class="time">{{event.date}} | {{event.startTime}}<span class="more"> - {{event.endTime}}</span></font>
           <div class="photo">
-            <img alt="Event Photo" class="eventPhoto" :src="get_photo(event)">
+            <img alt="Event Photo" class="eventPhoto" :src="event.thumbnail">
           </div>
           <div class="info">
             <br>
@@ -57,10 +58,10 @@
               <span class="preview"><h5 class="eventTitle">{{event.title}}</h5></span>
               <span class="more"><h2 class="eventTitle">{{event.title}}</h2></span>
               <span class="more"><h3>Location: {{event.location}}</h3></span>
-              <span class="more"><h3>Hosted by: <a :href="event.portal.links.web">{{event.portal.name}}</a></h3></span>
+              <!-- <span class="more"><h3>Hosted by: <a :href="event.portal.links.web" target="_blank">{{event.host}}</a></h3></span> -->
             </div>
             <div id="description">
-            <p class="eventDescript"><span class="preview">{{event.freeFoodApproved[0]}}</span>
+            <p class="eventDescript"><span class="preview">{{event.snip}}</span>
               <span class="more">{{event.description}}</span>
               </p>
             </div>
@@ -74,7 +75,7 @@
 <script> 
 import axios from 'axios'
 import Demo from '../assets/shuffle-demo';
-
+import { createSections, categoryArray } from '../assets/tools/tools'
 
 export default {
     name: 'Edibull',
@@ -84,10 +85,16 @@ export default {
     }
   },
   created () {
-    axios.get("https://edibullapp.com/events?approved=true")
-      .then((response) => {
-        this.events = response.data.events;
-        console.log('this.events', this.events)
+    let categoryStr = ''
+    categoryArray.forEach((cat) => {
+      categoryStr += `${cat.id}Approved,`
+    })
+    const url = `https://edibullapp.com/events?category=${categoryStr}&data=${categoryStr}id,title,dates,location,portal.id,portal.name,portal.picture_url,description,thumbnail_url`
+    console.log(url)
+    axios.get(url)
+      .then((response) => { 
+        this.events = createSections(response.data.events)
+        console.log("this.events", this.events)
       }, (error) => {
         console.log('axios err:', err)
       })
@@ -109,59 +116,17 @@ export default {
   },
   methods: {
     
-    get_photo(event) { // get time of event
-      if (event.thumbnail_url != null) {
-          return event.thumbnail_url;
-      } else if(event.portal.picture_url != null) {
-          return event.portal.picture_url;
-      }
-      return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
-    },
-    get_group(event){ //assign card a group
-      if(event.speakerApproved.length > 0){
-        return '["Speaker"]';
-      } else if (event.employmentApproved.length > 0) {
-        return '["Employment"]';
-      } else if (event.fundraiseApproved.length > 0) {
-        return '["Fundraiser"]';
-      } else if (event.volunteerApproved.length > 0) {
-        return '["Volunteer"]';
-      } else if (event.freeFoodApproved.length > 0) {
-        return '["Free Food"]';
-      }
-    },
-    time_preview(event) { //display month, day, and start time
-      const startUtcTime = new Date(event.dates[0].starts_at)
-      var startTimeValue = this.getTime(startUtcTime)
-      var months = ['Jan.', 'Feb.', 'March', 'Apr.', 'May', 'June', 'July', 'Aug.', 'Sept.', 'Oct.', 'Nov.', 'Dec.']
-      var month = event.dates[0].starts_at.substring(5, 7);
+    // get_photo(event) { // get time of event
+    //   if (event.thumbnail_url != null) {
+    //       return event.thumbnail_url;
+    //   } else if(event.portal.picture_url != null) {
+    //       return event.portal.picture_url;
+    //   }
+    //   return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
+    // },
 
-      return  months[month - 1] + " " + event.dates[0].starts_at.substring(8, 10) + " | " + startTimeValue;
-    },
-
-    display_time(event){ //display month, day, start and end times
-      const endUtcTime = new Date(event.dates[0].ends_at)
-      var endTimeValue = this.getTime(endUtcTime)
-      return endTimeValue;
-    },
-    
-    getTime (utcTime) { // get time of event
-      const hours = Number(utcTime.getHours())
-      const minutes = Number(utcTime.getMinutes())
-
-      // calculate
-      let timeValue
-      if (hours > 0 && hours <= 12) {
-        timeValue = `${hours}`
-      } else if (hours > 12) {
-        timeValue = `${hours - 12}`
-      } else if (hours === 0) {
-        timeValue = '12'
-      }
-
-      timeValue += (minutes < 10) ? `:0${minutes}` : `:${minutes}` // get minutes
-      timeValue += (hours >= 12) ? 'pm' : 'am' // get AM/PM
-      return timeValue;
+    get_group(e) {
+      return "[\""+e.category+"\"]";
     },
 
     display_card(e) { //display big card on click
@@ -207,24 +172,20 @@ export default {
     },
   }
 }
-
 var back_out = function(){ //deletes big card
-      var fsmActual = document.getElementsByClassName("fsm_actual");
-      fsmActual[0].remove();
-    }
+  var fsmActual = document.getElementsByClassName("fsm_actual");
+  fsmActual[0].remove();
+}
 
 </script>
 
 <style>
-
 .highlight{
   background-color: rgb(255, 255, 0, 0.8);
 }
 </style>
 
-
 <style scoped>
-
 .eventPhoto {
   height:150px;
   border-radius:50%; 
@@ -265,18 +226,24 @@ var back_out = function(){ //deletes big card
 
 input[type=search] {
     width: 130px;
-    margin-top: 15px;
+    margin-top: 10px;
     float: right;
     box-sizing: border-box;
-    border: 2px solid #ccc;
+    border: 2px solid rgb(42, 83, 49);
     border-radius: 4px;
     font-size: 16px;
     -webkit-transition: width 0.8s ease-in-out;
-    transition: width 0.4s ease-in-out; 
+    transition-property: width, border-radius;
+    transition-duration: 0.7s ease-in-out;
+    outline: none;
 }
 
 input[type=search]:focus {
-    width: 80%;
+  width: 80%;
+  border-radius: 20px;
+  background-image: url('../assets/searchicon.png');
+  background-position: right;
+  background-repeat: no-repeat;
 }
 
 .card {
@@ -371,6 +338,12 @@ input[type=search]:focus {
 
 .fsm_actual .active .more {
   display: inline;
+}
+
+.fsm_actual .active #description {
+  float: right;
+  margin-right: 20px;
+  max-width: 900px;
 }
 
 .fsm_actual .active:hover{
