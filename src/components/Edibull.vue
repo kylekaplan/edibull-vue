@@ -58,7 +58,7 @@
               <span class="preview"><h5 class="eventTitle">{{event.title}}</h5></span>
               <span class="more"><h2 class="eventTitle">{{event.title}}</h2></span>
               <span class="more"><h3>Location: {{event.location}}</h3></span>
-              <!-- <span class="more"><h3>Hosted by: <a :href="event.portal.links.web" target="_blank">{{event.host}}</a></h3></span> -->
+              <span class="more"><h3>Hosted by: <a :href="event.link" target="_blank">{{event.host}}</a></h3></span>
             </div>
             <div id="description">
             <p class="eventDescript"><span class="preview">{{event.snip}}</span>
