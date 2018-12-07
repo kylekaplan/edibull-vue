@@ -1,77 +1,399 @@
 <template>
-  
-  <div id="blank">
-    <!-- search bar -->
-    <!-- <div class="col-4@sm col-3@md">
-      <div class="filters-group">
-        <label for="filters-search-input" class="filter-label">Search</label>
-        <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input">
-      </div>
-    </div> -->
-    <div id="grid" class="grid-container">
-      <!-- <div class="card" data-groups='["animal"]' v-for="event in events" :key="event.id">
-        <a href="">
-        <div class="photo">
-        <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
-        </div>
-        <div class="container">
-          <h3>{{event.portal.name}} </h3>
-        </div>
-        </a>
-      </div> -->
-      <!-- bootstrap implementation -->
-      <figure class="col-4@sm card" data-groups='["animal"]' v-for="event in events" :key="event.id" data-date-created="2016-08-12" data-title="Crocodile">
-        <div class="aspect aspect--16x9">
-          <div class="aspect__inner">
-            <img alt="Event Photo" :src="get_photo(event)" style="height:150px;border-radius:50%;margin:10px">
+  <div>
+    <div class="container">
+      <div id="search-container">
+        <div class="row">
+          <div class="col-4@sm col-3@md">
+            <div id="look_up">
+              <div class="filters-group" id="search_bar">
+                <input class="textfield filter__search js-shuffle-search" type="search" id="filters-search-input" placeholder="Search Portals...">
+              </div>
+            </div>
           </div>
         </div>
-        <figcaption>Crocodile</figcaption>
-      </figure>
+        <div class="row">
 
-      <div class="col-1 my-sizer-element"></div>
+          <!-- Category buttons -->
+          <div class="filters-group">
+            <div class="btn-group filter-options">
+              <button v-on:click="buttonActive(cat)" class="btn btn--primary" v-for="cat in categories" v-bind:data-group="cat.umbrella" :key="cat.umbrella">
+                {{cat.umbrella}}
+              </button>
+
+            </div>
+          </div>
+
+          <p>{{category}} button was pressed</p>
+        </div>
+      </div>
+      <div class="grid-container" id="grid">
+          <div v-for="image in photos" :key="image.id" class="w-25 p-1 card"
+            :data-groups="get_portal(image)"
+          >
+          <div class="card_wrap" v-on:click="display_card($event)">
+
+              <div class="aspect aspect--4x3">
+                <div class="aspect__inner">
+                  <span class="preview"><h6 class="portTitles">{{image.name}}</h6></span>
+                  <img v-if="loaded" class="photo" :src="get_photo(image)" />
+                  <div v-else class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+                  <span class="more"><br><h2 class="portTitles">{{image.name}}</h2></span>
+                  <!-- <span class="more"><h5 class="category">Category: {{image.category.name}}</h5></span> -->
+                  <span class="more"><h5 class="website"><a :href="image.website_url" target="_blank">Organization Website</a></h5></span>
+                  <span class="more"><p>{{image.description}}</p></span>
+                </div>
+              </div>
+            </div>
+          <div class="w-25 my-sizer-element"></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script> 
 import axios from 'axios'
-import Shuffle from 'shufflejs';
+import Demo from '../assets/shuffle-demo';
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+const grayPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=='
+const blackPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+const greenPixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mO02Vz4HwAE9AJhcLBN6AAAAABJRU5ErkJggg=='
 export default {
-    name: 'Portals',
-    data () {
-    return {
-      events: [],
+  name: 'Portals',
+  data () {
+    return {  
+      // testing counter
+      category: null,
+      portals: [],
+      photos: [
+        { id: 1, src: grayPixel  },
+        { id: 2, src: blackPixel },
+        { id: 3, src: greenPixel },
+      ],
+      loaded: false,
+      // categories: null,
+      // subcategories: null,
+      categories: [
+        {
+          umbrella: 'Fraternity and Sorority Life',
+          subCategories: [
+            "Council", 
+            "Honor Society",
+            "Interfraternity Council",
+            "Multicultural Greek Council",
+            "National Pan-Hellenic Council",
+            "Panhellenic Association",
+          ]
+        },
+        {
+          umbrella: 'Service',
+          subCategories: [
+            "Animals (Community Partners)",
+            "Culture Awareness (Community Partners)",
+            "Disabilities(Community Partners)",
+            "Disaster Relief (Community Partners)",
+            "Education/Literacy (Community Partners)",
+            "Environmental (Community Partners)",
+            "Family Services (Community Partners)",
+            "General Service (Community Partners)",
+            "Health & Wellness (Community Partners)",
+            "Hunger & Homelessness Services (Community Partners)",
+            "Hunger & Nutrition (Community Partners)",
+            "Political Engagement (Community Partners)",
+            "Senior Citizen (Community Partners)",
+            "Veterans (Community Partners)",
+            "Youth Development (Community Partners)",
+          ]
+        },
+        {
+          umbrella: 'Student Life',
+        },
+        {
+          umbrella: 'Student Organizations',
+        },
+        {
+          umbrella: 'USF Health Morsani College of Medicine',
+        },
+        {
+          umbrella: 'Umbrella',
+        }
+      ],
     }
   },
-  mounted () {
-    axios.get("https://edibullapp.com/events?approved=true")
-      .then((response) => {
-        this.events = response.data.events;
-        console.log('this.events', this.events)
-      }, (error) => {
-        // pass
-      })
-    const shuffleInstance = new Shuffle(document.getElementById('grid'), {
-      itemSelector: '.card',
-      sizer: '.my-sizer-element'
-    });
-  },
+
+  created () {
+    axios.get("https://edibullapp.com/portals")
+      .then((x) => {
+        // this.photos = response.data.portals
+        this.photos = x.data.portals
+        this.loaded = true
+        this.demo = new Demo(document.getElementById('grid'));
+        // resolve(x.data.portals)
+      }, (err) => {
+        console.log('axios err:', err)
+    })
   
+  },
+  mounted () {
+    console.log('initialized shuffle')
+  },
+  beforeDestroy () {
+    // Dispose of shuffle when it will be removed from the DOM.
+    this.demo.shuffle.destroy();
+    this.demo.shuffle = null;
+  },
+  updated() {
+    // Fired every second, should always be true
+    console.log('updated')
+    console.log('this.demo', this.demo)
+    this.demo.shuffle.resetItems()
+    // console.log('updated')
+  },
   methods: {
-    //get photo for event
-    get_photo(event) {
-      if(event.portal.picture_url != null) {
-          return event.portal.picture_url;
+
+    //get photo for portal
+    get_photo(port) {
+      if (port.picture_url === "https://edibullapp.com/no-image.jpg") {
+        return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
       }
-      return "./assets/edibullFINAL 1024.png";
+      if(port.picture_url != null) {
+        return port.picture_url;
+      }
+      
+      return "http://localhost:8080/img/edibullFINAL%201024.8420ac53.png";
     },
-  }
+    get_portal(port){
+      try {
+        var umbrellaName = port.umbrella.name;
+        if (umbrellaName !== undefined) {
+          return  '["' + umbrellaName + '"]'
+        } else {
+          return '["Others"]'
+        }
+        return
+      } catch (error) {
+        return '["No Name"]'
+      }
+    },
+    buttonActive: function(cat) {
+      // var attribute = event.target.getAttribute("data-group");
+      console.log("attribute::", cat);
+      // console.log ("actual button:: ", this.categories.attribute); 
+    },
+
+    display_card(e) { //display big card on click
+
+      var card = e.target.closest('.card'); //find wrapper
+
+      card.classList.add('active'); //add active to class of card
+
+      //create big card
+      var fsmactual = document.createElement("div");
+      fsmactual.setAttribute('class', 'fsm_actual');
+      var fsminner = document.createElement("div");
+      fsminner.setAttribute('class', 'fsm_inner');
+      var temp = card.cloneNode(true);
+
+      //create exit button and style it
+      var btn = document.createElement("BUTTON");
+      btn.setAttribute('class', 'exit');
+      btn.appendChild(document.createTextNode("x"));
+      btn.style.backgroundColor = "rgb(42, 83, 49)";
+      btn.style.color = "white";
+      btn.style.borderRadius = "10px";
+      btn.style.position = "absolute";
+      btn.style.marginTop = "5px";
+      btn.style.marginLeft = "15px";
+      btn.style.height = "38px";
+      btn.style.width = "40px";
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+
+      //style big card
+      temp.style.cssText = "";
+      temp.style.position="fixed";
+      temp.style.top=0;
+      temp.style.left=0;
+
+      //add exit button to card clone, then send clone to body 
+      temp.insertBefore(btn, temp.childNodes[0]);
+      fsminner.appendChild(temp);
+      fsmactual.appendChild(fsminner);
+      document.body.appendChild(fsmactual);
+      btn.addEventListener("click", back_out); //add back_out function to exit button
+    },
+  },
 }
+
+var back_out = function(){ //deletes big card
+      var fsmActual = document.getElementsByClassName("fsm_actual");
+      fsmActual[0].remove();
+    }
+    
 </script>
 
 <style scoped>
-.col-1 {
-  width: 400px; 
+
+/*hides content in more*/
+.more { 
+  display: none;
+  overflow: hidden;
+}
+
+.portTitles {
+  color: rgb(42, 83, 49);
+}
+
+#search-container {
+  margin-top: 10px;
+}
+.portTitle {
+  color: rgb(42, 83, 49);
+}
+.grid-container {
+  display: grid;
+  grid-row: 300px;
+  grid-gap: 10px;
+  margin: 10px;
+}
+/* filter buttons */
+.btn {
+  background-color: rgba(255, 255, 255, 0.726);
+  color:  rgb(42, 83, 49);
+  border: 2px solid  rgb(42, 83, 49);
+  padding: 10px 16px;
+  margin-right: 5px;
+  text-align: center;
+  transition-duration: 0.4s;
+}
+.btn:hover {
+  background-color: rgb(42, 83, 49);
+  color: white;
+}
+.filter-options .active {
+  background-color: rgb(42, 83, 49);
+  color: white;
+}
+.button {
+  margin-right: 15px;
+}
+.card {
+  box-shadow: 0 4px 8px o rgba(0,0,0,0.6);
+  background: rgba(255, 255, 255, 0.712);
+  width: 300px;
+  overflow: hidden;
+  border-radius: 30px;
+  text-align: center;
+  height: 220px;
+}
+.card:hover{
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.6);
+  background: rgba(255, 255, 255, 0.918);
+}
+.photo {
+  width: 50%;
+  height: 50%;
+  border-radius: 10px;
+  margin:10px
+}
+/* loading css */
+.lds-grid {
+  display: inline-block;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+.lds-grid div {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  animation: lds-grid 1.2s linear infinite;
+}
+.lds-grid div:nth-child(1) {
+  top: 6px;
+  left: 6px;
+  animation-delay: 0s;
+}
+.lds-grid div:nth-child(2) {
+  top: 6px;
+  left: 26px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(3) {
+  top: 6px;
+  left: 45px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(4) {
+  top: 26px;
+  left: 6px;
+  animation-delay: -0.4s;
+}
+.lds-grid div:nth-child(5) {
+  top: 26px;
+  left: 26px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(6) {
+  top: 26px;
+  left: 45px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(7) {
+  top: 45px;
+  left: 6px;
+  animation-delay: -0.8s;
+}
+.lds-grid div:nth-child(8) {
+  top: 45px;
+  left: 26px;
+  animation-delay: -1.2s;
+}
+.lds-grid div:nth-child(9) {
+  top: 45px;
+  left: 45px;
+  animation-delay: -1.6s;
+}
+@keyframes lds-grid {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.fsm_actual .active{
+  transition: all 2s ease-in-out;  
+  height: 98%;
+  width: 98% !important;
+  z-index: 100;
+  margin-top: 10px;
+  margin-left: 10px;
+  background-color: white;
+  font-size: 25px;
+  overflow: auto;
+}
+
+.fsm_actual .active .photo {
+  float: left;
+  height: 250px;
+  width: 250px;
+  margin: 50px 20px 25px 25px;
+  border-radius: 10px;
+}
+.fsm_actual .active .preview {
+  display: none;
+  overflow: hidden;
+}
+
+.fsm_actual .active .more {
+  display: inline;
+}
+.fsm_actual .active:hover{
+  box-shadow: none;
 }
 </style>
