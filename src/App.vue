@@ -1,42 +1,39 @@
 <template>
   <div class="main">
-   <div class="banner">
-    <div class="row">
-      <div class="column left">
+    <div class="banner">
+      <div class="row">
+        <div class="column left">
           <a href="https://edibullapp.com/" target="_blank">
-            <img id="edibulllogo" alt="Edibulllogo" src="./assets/edibullFINAL 1024.png" style="border-radius:50%">
+            <img
+              id="edibulllogo"
+              alt="Edibulllogo"
+              src="./assets/edibullFINAL 1024.png"
+              style="border-radius:50%"
+            >
           </a>
-      </div>
-      <div class="column right">
-        <div id="logo">
-          <font>EdiBull</font>
+        </div>
+        <div class="column right">
+          <div id="logo">
+            <font>EdiBull</font>
+          </div>
         </div>
       </div>
-    </div>  
     </div>
-     <!-- Nav Bar -->
-    <div id="nav-bar">
-      <!-- vue-router (link to separate page) -->
-      <div class="hover">
-        <p class="nav-button"><router-link to="/" class="link">Events</router-link></p>
-      </div>
-      <div class="hover">
-        <p class="nav-button"><router-link to="/portals" class="link">Portals</router-link></p>
-      </div>
-      <div class="hover">
-        <p class="nav-button"><router-link to="/" class="link">Local Deals</router-link></p>
-      </div>
-    </div>
+    <v-toolbar class="navBar">
+      <v-toolbar-items class="hidden-sm-and-down">
+        <v-btn flat to="/">Events</v-btn>
+        <v-btn flat to="/portals">Portals</v-btn>
+        <v-btn flat to="/">Local Deals</v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'app',
-
-}
+  name: "app"
+};
 </script>
 
 <style>
@@ -47,7 +44,6 @@ body {
 
 
 <style scoped>
-
 a {
   color: black;
 }
@@ -63,9 +59,13 @@ a {
   width: 100%;
   height: 60%;
   /* background-color: rgb(42, 83, 49); */
-  background-image: linear-gradient(to right, rgb(42, 83, 49), rgb(31, 124, 45));
+  background-image: linear-gradient(
+    to right,
+    rgb(42, 83, 49),
+    rgb(31, 124, 45)
+  );
   color: rgb(247, 250, 207);
-  }
+}
 
 #edibulllogo {
   position: relative;
@@ -79,8 +79,12 @@ a {
 }
 
 #nav-bar {
-  background-image: linear-gradient(to right, rgb(156, 173, 108), rgb(188, 185, 107));
-  display: flex; 
+  background-image: linear-gradient(
+    to right,
+    rgb(156, 173, 108),
+    rgb(188, 185, 107)
+  );
+  display: flex;
 }
 #nav-bar p {
   padding: 0px 30px;
@@ -101,7 +105,7 @@ a {
 }
 
 .hover:before {
- content: "";
+  content: "";
   position: absolute;
   width: 100%;
   height: 5px;
@@ -123,7 +127,7 @@ a {
 
 .column {
   float: left;
-} 
+}
 
 .left {
   width: 40%;
@@ -131,5 +135,13 @@ a {
 
 .right {
   width: 60%;
+}
+.navBar {
+  background-image: linear-gradient(
+    to right,
+    rgb(156, 173, 108),
+    rgb(188, 185, 107)
+  );
+  display: flex;
 }
 </style>
