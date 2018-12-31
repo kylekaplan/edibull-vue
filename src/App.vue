@@ -1,29 +1,32 @@
 <template>
   <div class="main">
-    <div class="banner">
-      <div class="row">
-        <div class="column left">
-          <a href="https://edibullapp.com/" target="_blank">
-            <img
-              id="edibulllogo"
-              alt="Edibulllogo"
-              src="./assets/edibullFINAL 1024.png"
-              style="border-radius:50%"
-            >
-          </a>
-        </div>
-        <div class="column right">
-          <div id="logo">
-            <font>EdiBull</font>
-          </div>
-        </div>
-      </div>
-    </div>
+    <v-toolbar height="125" class="banner">
+      <a class="ediLogo" href="https://edibullapp.com/" target="_blank">
+        <img
+          id="edibulllogo"
+          alt="Edibulllogo"
+          src="./assets/edibullFINAL 1024.png"
+          style="border-radius:50%"
+        >
+      </a>
+      <div class="logo">EdiBull</div>
+    </v-toolbar>
     <v-toolbar class="navBar">
+      <!-- Should be a mobile toolbar, issues
+        <v-menu class="hidden-md-and-up">
+        <v-btn slot="activator" icon>
+          <v-icon>menu</v-icon>
+        </v-btn>
+        <v-list>
+          <v-list-tile v-for="(item, index) in items" :key="index" @click="route()">
+            <v-list-tile-title>{{ item }}</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>-->
       <v-toolbar-items class="hidden-sm-and-down">
         <v-btn flat to="/">Events</v-btn>
         <v-btn flat to="/portals">Portals</v-btn>
-        <v-btn flat to="/">Local Deals</v-btn>
+        <!-- <v-btn flat to="/">Local Deals</v-btn> -->
       </v-toolbar-items>
     </v-toolbar>
     <router-view></router-view>
@@ -32,7 +35,13 @@
 
 <script>
 export default {
-  name: "app"
+  name: "app",
+  methods: {
+    route: function() {
+      console.log("hello tehre");
+    }
+  },
+  data: () => ({})
 };
 </script>
 
@@ -48,16 +57,16 @@ a {
   color: black;
 }
 
-#logo {
-  text-align: left;
+.logo {
+  padding-left: 40px;
   font-size: 80px;
   font-family: "Arial Black";
 }
 
 .banner {
   position: relative;
-  width: 100%;
-  height: 60%;
+  width: 100% !important;
+  height: 60% !important;
   /* background-color: rgb(42, 83, 49); */
   background-image: linear-gradient(
     to right,
@@ -143,5 +152,8 @@ a {
     rgb(188, 185, 107)
   );
   display: flex;
+}
+.ediLogo {
+  padding-bottom: 20px;
 }
 </style>
